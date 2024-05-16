@@ -1,0 +1,11 @@
+.DS_Store
+.gitattributes
+.Rproj*
+-old/
+data/
+img/
+papers/
+R/
+*.bbl
+*.log
+*.synctex.gz
