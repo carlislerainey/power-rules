@@ -174,9 +174,9 @@ urlcolor=blue % color of external links
 
 \begin{center}
 
-{\huge \textbf{Power Rules}\symbolfootnote[1]{This essay flows from many discussions with undergraduate and graduate students. 
+{\huge \textbf{Power Rules}\symbolfootnote[1]{This essay flows from many discussions with undergraduate students, PhD students, and colleagues. 
 In these discussions, we have thought about power as a minor extension of estimation and inference rather than power as a distinct topic. 
-In this essay, I try to articulate that perspective and help researchers extend their familiarity with estimation and inference to thinking about statistical power.}
+In this essay, I try to articulate that perspective and help researchers extend their intuitions and expertise with estimation and inference to statistical power. Marco Aviña, Scott Clifford, and Chuck Smith provided valuable comments on earlier drafts.}
 }
 
 \vspace{0.4cm}
@@ -204,13 +204,14 @@ Get latest version \href{https://github.com/carlislerainey/power-rules/blob/main
 % Abstract
 {\centerline{\textbf{Abstract}}}
 \begin{quote}\noindent
-Recent work in political science emphasizes the importance of statistical power in political science and shows that power in political science tends to be extremely low. 
+Recent work emphasizes the importance of statistical power and shows that power in the social sciences tends to be extremely low. 
 In this paper, I offer simple rules that make statistical power more approachable for substantive researchers. 
-In the cases of simple treatment effects and interactions, these rules are sufficient for a complete and compelling power analysis using only paper-and-pencil. 
-In other cases, these rules can provide a useful ballpark prediction before turning to specialized software or complex simulations. 
+In the case of balanced, between-subjects designs (perhaps controlling for pre-treatment variables), these rules are sufficient for a complete and compelling power analysis for treatment effects and interactions using only paper-and-pencil. 
+More importantly, these rules help researchers develop a sharp intuition about statistical power.
+For more complex designs, these rules can provide a useful ballpark prediction before turning to specialized software or complex simulations. 
 The rules allow researchers to predict statistical power using (1) features of a reference population, (2) an existing study with a similar design and outcome, and/or (3) a pilot study. 
-For example, it can be helpful for readers and researchers to know that experiments have 80\% power to detect effects that are 2.5 times larger than the standard error. 
-I hope these rules will lower the barrier to entry for researchers new to thinking carefully about statistical power and help researchers design powerful, informative experiments.
+For example, it can be helpful for readers and researchers to know that experiments have 80\% power to detect effects that are 2.5 times larger than the standard error and how to easily form a conservative prediction of the standard error using pilot data.
+These rules lower the barrier to entry for researchers new to thinking carefully about statistical power and help researchers design powerful, informative experiments.
 \end{quote}
 
 % Add quote to first page
@@ -240,10 +241,11 @@ Experiments continue to grow in political science \citep{Druckman2021}, and desi
   Time-sharing Experiments for the Social Sciences (TESS) notes that power analysis is ``encouraged'' (accessed May 11, 2024, persistent link: \url{https://archive.md/Xc0UY}). 
   The Civic Health and Institutions Project, a 50 States Survey, (CHIP50) notes that power analysis is ``strongly encouraged'' (accessed May 11, 2024, persistent link: \url{https://archive.md/SLpgW}). 
   The National Institutes of Health (NIH) provides several examples to ``demonstrate rigor'' and all examples include a discussion of statistical power (accessed May 11, 2024, persistent link: \url{https://archive.md/Jh9Lp}). 
-  The popular OSF pre-registration template asks user to provide an explicit sample size rationale, which could include a power analysis \citep{Bowman2020}.}
+  The popular OSF pre-registration template asks users to provide an explicit sample size rationale, which could include a power analysis \citep{Bowman2020}.}
 Statistical power, or the chance of rejecting the null hypothesis for a given treatment effect, is a common, powerful way to select or evaluate a sample size.
 The consequences of low power are increasingly understood: low power can lead to wildly overestimated treatment effects \citep{Gelman2014} and ambiguous results that are difficult to publish (e.g., \citealt{Alrababah2023}). 
 Nonetheless, \cite{ArelBundock2022} argue that only about 10\% statistical tests in political science have at least 80\% power. 
+And political science is hardly unusual \citep{Cohen1962, Button2013, Ioannidis2017, Stanley2018, Yang2023, Stommes2023}.
 Underscoring their important findings, \cite{ArelBundock2022} emphasize: ``our research community must address the problems of low power and selection on significance with institutional, methodological, and theoretical remedies.''
 
 One apparent problem is that while political scientists understand estimation and inference for experimental data very well (e.g., least squares regression with robust standard errors), political scientists are less comfortable thinking about statistical power prior to data collection. 
@@ -257,7 +259,10 @@ Most importantly, political scientists tend to focus on treatment effects on the
   \cite{Lakens2022} offers a careful and thorough discussion of sample size justifications for an audience of psychologists, but (appropriately) uses terms common in psychology.
   For example, Lakens centers much of his discussion around Cohen's \emph{d}, standardized effect size used often in psychology but less often in political science.
   } 
-In political science, recent conceptual work and statistical software \citep{Blair2019, Blair2023} make complex simulations to evaluate research designs more accessible, but simulation to obtain statistical power remains challenging compared to analyzing experimental data.
+And while psychologists rely on a range of procedures to test hypotheses, political scientists typically use least squares regression with robust standard errors.
+In political science, recent conceptual work and statistical software \citep{Blair2019, Blair2023} make complex simulations to comprehensively evaluate research designs more accessible, but simulation to obtain statistical power remains challenging compared to analyzing experimental data.
+Political scientists lack a gateway between the simple, robust tools of inference using experimental data and the complex, tedious tools that allow complete and careful evaluations of research designs.
+This paper can help create the link.
 
 In this paper, I offer several simple rules for assessing statistical power. 
 These rules do not require special software or simulation and are motivated from statistical analyses common in political science. 
@@ -273,34 +278,37 @@ There is tremendous value in simple, conceptual rules of thumb---the kind of rul
 While specialized software and complex simulations are helpful (and essential in some cases), simple rules have several benefits: 
 (1) simple rules can make statistical power accessible, rather than seem like a mystical quantity; 
 (2) simple rules allow us to reason fluently about design choices; 
-(3) even if we ultimately rely on a more sophisticated approach, simple rules can reduce the chance of making big errors by giving us a ballpark starting point; and
+(3) simple rules can reduce the chance of making big errors by giving us a ballpark starting point even if we ultimately rely on a more sophisticated approach; and
 (4), in many cases, simple rules are sufficient to justify a sample size and simulations and specialized software are unnecessary. 
 In this paper, I walk through several rules to predict the statistical power of an experiment. 
+For simple randomization schemes, these rules are sufficient to demonstrate adequate power for treatment effects and interactions.
 I explain the intuition of each rule, describe how we can use the rule to plan or evaluate a study, and give examples.
+The rules are often sufficient to predict the power for studies of treatment effects and interactions using features of a reference population, existing studies, and/or pilot data.
 
 \section*{Review: The Estimation and Inference Framework}
 
 Throughout this discussion, I assume that we use ordinary least squares and robust standard errors to estimate the treatment effect. 
-I assume size-0.05, one-sided tests of directional hypotheses evaluated in practice using 90\% confidence intervals.\footnote{
-  A later section describes how researchers can modify the rules for 95\% confidence intervals
-}
-I borrow the language of survey experiments about the experimental units as ``respondents,'' but the logic generalizes to other types of units (e.g., villages). 
+I assume size-0.05, one-sided tests of directional hypotheses evaluated in practice using 90\% confidence intervals. 
+(A later section describes how researchers can modify the rules for 95\% confidence intervals, if they prefer.)
+To make the discussion more natural, I borrow the language of survey experiments and describe the experimental units as ``respondents,'' but the logic generalizes to other types of units (e.g., villages). 
 
 Formally, I assume potential outcomes $\mathcal{Y}_{i}(1)$ if assigned to treatment and $\mathcal{Y}_{i}(0)$ if assigned to control for respondent $i$ of $N$. 
-An experiment might use more than two conditions, but for the sake of the discussion below, I focus on the statistical power of a comparison of just \emph{two} of these conditions, which I call treatment and control.
-For these two conditions, we want to make inferences about the treatment effect $\tau = \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1)} - \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0)}$.
+An experiment might use more than two conditions, but for the sake of the discussion below, I focus on the statistical power of a comparison of just \emph{two} of these conditions, which I call treatment and control.\footnote{
+   In many experiments, there will be multiple comparisons of interest. 
+   In this cases, we need to compute the statistical power for each test separately.
+   As the \textit{Journal of Politics} guidelines note: ``power must be calculated for each test individually'' (accessed May 3, 2024; persistent link: \url{https://archive.md/g7YQ3}).
+  }
+For these two conditions, we want to make inferences about the average treatment effect $\tau = \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1)} - \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0)}$ (which I refer to as a ``treatment effect'' throughout).
 
 To make inferences about $\tau$, we randomly assign $n_{1}$ respondents to treatment and $n_{0}$ respondents to control, where $N = \ n_{1} + n_{0}$.\footnote{
   Note that $N$ represents the \emph{total number of the respondents} in the comparison, while $n_{i}$ represents the number of respondents \emph{in condition} $i$\emph{.}
   Below, I assume equal numbers of respondents in each condition, so I let $n$ represent the number of respondents per condition, which is a convenient quantity when thinking about experimental design and statistical power.
   }
 We create an indictor variable $D_{i}$ that equals 1 if the respondent is assigned to treatment and 0 if the respondent is assigned to control. 
-Then we create the observed outcome $Y_{i} = \mathcal{Y}_{i}\left( D_{i} \right)$ by assigning $Y_{i}$ the potential outcome under treatment if $D_{i} = 1$ and the potential outcome under control if $D_{i} = 1$. 
+Then we create the observed outcome $Y_{i} = \mathcal{Y}_{i}\left( D_{i} \right)$ by assigning $Y_{i}$ the potential outcome under treatment if $D_{i} = 1$ and the potential outcome under control if $D_{i} = 0$. 
 Then we estimate the treatment effect using $\widehat{\tau} = \frac{1}{n_{1}}\sum_{i = 1}^{N}{{D_{i} \cdot Y}_{i}} - \frac{1}{n_{0}}\sum_{i = 1}^{N}{{\left( 1 - D_{i} \right) \cdot Y}_{i}}$, which we compute in practice using least squares estimates of the model $Y_{i} = \alpha + \tau \cdot D_{i} + \epsilon_{i}$. 
 In some cases, we might increase the precision of the estimates by including variables measured pre-treatment as control variables in the regression model.
 
-
-  
 To estimate the sampling variance of $\widehat{\tau}$, we use Neyman's (\citeyear{Neyman1923}) conservative variance estimator $\widehat{Var}\left( \widehat{\tau} \right) = \ \frac{s_{1}^{2}}{n_{1}} + \ \frac{s_{0}^{2}}{n_{0}}$, where $s_{1}^{2}$ and $s_{0}^{2}$ represent the sample variance in the treatment and the control group, respectively. 
 Then we can estimate the standard error of $\widehat{\tau}$ with ${\widehat{SE}}_{\widehat{\tau}} = \ \sqrt{\widehat{Var}\left( \widehat{\tau} \right)}$.
 
@@ -338,24 +346,24 @@ By convention, 80\% power is the minimal standard for ``adequate'' statistical p
 First, how can we compute statistical power? 
 It turns out that statistical power is determined by the treatment effect and the
 standard error of the estimate. 
-To predict the statistical power of an experiment, we must make assumptions or ``informed guesses'' about certain quantities. 
+To compute the statistical power of an experiment, we must make assumptions or ``informed guesses'' about certain quantities. 
 I denote these assumed values with tilde. For example, I denote the assumed treatment effect as $\widetilde{\tau}$.\footnote{
-  We have three $\tau$s floating around: the \emph{actual} treatment effect $\tau$, the treatment effect \emph{assumed for the sake of computing power} $\widetilde{\tau}$, and, the \emph{estimated} treatment effect $\widehat{\tau}$. 
-  I read the tilde notation as ``assumed to predict power.'' 
+  We have three $\tau$s floating around: the \emph{actual} treatment effect $\tau$, the treatment effect \emph{assumed for the sake of computing power} $\widetilde{\tau}$, and the \emph{estimated} treatment effect $\widehat{\tau}$. 
+  I read the tilde notation as ``assumed to compute power.'' 
   For example, I read $\widetilde{\tau}$ as ``the treatment effect assumed
-  to predict power.'' 
+  to compute power.'' 
   The tilde notation also means ``Wait!---think about this carefully, it is an assumption requiring judgment.''}
 This just means ``the treatment effect we are assuming for the sake of computing statistical power.''
 
 How can we compute the statistical power of an experiment? 
 An intuitive approach uses the construction of the 90\% confidence interval. 
 Recall that we will reject the null hypothesis if the lower-bound of the 90\% confidence interval falls above zero. 
-The arms of the 90\% confidence interval are 1.64 standard errors wide.\footnote{
+The arms of the 90\% confidence interval are about 1.64 standard errors wide.\footnote{
   I write ``about'' 1.64 standard errors because in practice we use the \emph{estimated} standard error, not the actual standard error. 
   However, the estimated standard error is sufficiently precise to treat
   the two interchangeably in this context.
   }
-This means that we will reject the null of if the estimate of the treatment effect is larger than 1.64 standard errors. 
+This means that we will reject the null hypothesis if the estimate of the treatment effect is larger than 1.64 standard errors. 
 Thus, the power of the study is the percent of the sampling distribution that is larger than 1.64 standard errors. 
 Recall that the sampling distribution is approximately normally distributed and centered over the treatment effect $\tau$ with standard deviation equal to the standard error of the estimate of $\tau$. 
 Thus, computing the power is simply computing the percent of the sampling distribution above $1.64 \cdot SE$.
@@ -383,17 +391,17 @@ To estimate power, we must make an informed assumption about the effect of inter
 Further, when we consider changes to the experimental design and the consequences for statistical power, it can be helpful to think about the numerator or the denominator of the key ratio $\frac{\tau}{SE}$: How do you make the effect as large as
 possible? And how do you make the estimate as precise as possible?
 
-\section*{What Treatment Effect Should I
-Assume?}
+\section*{What Treatment Effect Should I Assume?}
 
-To compute statistical power, we must assume a treatment effect. 
+To compute statistical power, we must make an informed assumption about the treatment effect. 
 Statements about statistical power always have the form: ``the experiment has \underline{~~~~~}\% power \emph{to detect a treatment effect of \underline{~~~~~}.''} 
 But obviously, we do not know the treatment effect with any precision, else we would not need to run the experiment. Thus, we must assume. 
 \citet[6]{Lakens2022}  writes: ``The goal of an a-priori power analysis is to achieve sufficient power, given a specific \emph{assumption} of the effect size a researcher wants to detect'' [emphasis mine].
 
 For any given experiment, there are three treatment effects worth thinking about: (1) the ``best guess'' of the effect, (2) the smallest plausible effect, and (3) the smallest substantively meaningful effect. 
 \emph{By default, we should focus on the statistical power for the smallest substantively meaningful effect.}\footnote{
-  Others refers to this effect as the ``smallest effect size of interest'' (SESOI) \citep{Lakens2018}, ``minimum effect of interest'' (MEI), and ``minimum meaningful effect'' (MME).
+  \cite{Rainey2014} refers this this threshold as the ``smallest substantively meaningful effect.''
+  Others refers to the same concept as the ``smallest effect size of interest'' (SESOI) \citep{Lakens2018}, ``minimum effect of interest'' (MEI), and ``minimum meaningful effect'' (MME).
   }
 However, when the smallest plausible effect is much larger than the smallest effect of substantive interest, we might compute power for the smallest plausible effect.\footnote{
   If the researchers are confident that a treatment effect is much larger than the smallest substantively meaningful effect, then they might decide it is wasteful to power their experiment for a treatment effect that is much smaller than the smallest plausible effect. 
@@ -413,13 +421,14 @@ As a crude approximation, we might feel tempted to use a rule of thumb such as d
 While rules of thumb can be useful as a starting point, they are only a first approximation---rules of thumb about ``small'' effects do not account for the question under study, so we must supplement these rules of thumb with additional arguments. 
 \citet[see esp. pp. 261-263]{Lakens2018} and \citet[see esp. pp. 10-13]{Lakens2022} offer helpful further discussion of how we might choose an treatment effect of interest.
 
+Importantly, we should \textit{not} use pilot data to estimate the treatment effect for the purpose of a power analysis \citep{Leon2011, Albers2018}.
+A pilot data set is too small to estimate the treatment effect with sufficient accuracy---the estimate from the pilot data might even have the wrong sign! (Though see \citet{Perugini2014} for a conserative approach and \cite{Lakens2014} on sequential analysis.)
+
 Making a thoughtful assumption about the treatment effect is perhaps the most challenging component of a power analysis. 
 We are doing a study to learn about a treatment effect, so it feels uncomfortable to make declarations about the effect beforehand. 
 It feels similarly awkward to divide effects into important and unimportant bins. 
 After all, ``important'' is ill-defined and varies continuously. It is not all obvious how to make this judgment. 
-To make this less awkward, I can say this: it is important to
-make a thoughtful assumption about the treatment effect, but simply
-\emph{making an explicit} assumption moves us most of the way toward a useful power analysis. 
+To make this less awkward, I can say this: it is important to make a thoughtful assumption about the treatment effect, but simply making an  \emph{explicit} assumption moves us most of the way toward a useful power analysis. 
 When we declare our assumption---regardless of whether we get it exactly right---we will have useful power analysis. 
 We can say that ``our experiment has \underline{~~~~~}\% power to detect a treatment effect of \underline{~~~~~}.''
 
@@ -437,10 +446,10 @@ If we can make a good guess $\widetilde{SD(Y)}$ about the value of $\sigma$, the
 To obtain a suitable value $\widetilde{SD(Y)}$ to plug in for
 $\sigma$, we can use the standard deviation of a measure of the
 outcome (or a similar outcome) in a reference population. 
-For example, perhaps a similar survey question has been asked in the American National Election Study or the Cooperative Election Study. 
+For a survey experiment, perhaps a similar survey question has been asked in the American National Election Study or the Cooperative Election Study. 
 We could also reference a previous experiment using the same outcome. 
 Plugging the standard deviation into the equation for the standard error, we can predict that the standard error in our study will be about $\frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{2 \cdot n}}$. 
-Importantly, $n$ represents the sample size per condition (not the total sample size).
+Importantly, $n$ represents the sample size \textit{per condition} (not the total sample size).
 
 \begin{restatable}[SD to SE]{rule0}{rulesdtose}
 \label{rule:sd-to-se}
@@ -462,12 +471,12 @@ Thus, while we should prefer robust standard errors in practice, classical stand
 We can sometimes substantially decrease the standard error by adjustment
 for covariates measured pre-treatment. 
 \cite{Clifford2021} suggest a promising strategy of measuring the outcome of interest both before and after the treatment and controlling for the pre-treatment measure of the outcome in the regression model. 
-Using the classical framework from above, \citet[547]{Cox1982} show that regression adjustment using $k$ pre-treatment covariates changes the standard error by a factor of about $\sqrt{\left( 1 - \rho^{2} \right) \cdot \left( 1 + \ \frac{k}{(N - 3)\  + \ k} \right)}$, where $\rho^{2}$ is the population $R^{2}$ for a regression predicting the outcome using the pre-treatment controls within each condition. 
-In the case of a single pre-treatment covariate, $\rho$ is the correlation between the outcome and the pre-treatment covariate within each condition (see also \citealt{Boldt2024}). 
-For many designs, $N$ is large relative to $k$, so that $\frac{k}{(N - 3)\  + \ k} \approx 1$ and the factor becomes about $\sqrt{\left( 1 - \rho^{2} \right)}$. 
+Using the classical framework from above, \citet[547]{Cox1982} show that regression adjustment using $k$ pre-treatment covariates changes the standard error by a factor of about $\sqrt{\left( 1 - \rho^{2} \right) \cdot \left( 1 + \ \frac{k}{(N - 3)\  + \ k} \right)}$, where $\rho^{2}$ is the population $R^{2}$ for a regression predicting the outcome using the pre-treatment controls within each condition (see also \citealt{Boldt2024}).
+In the case of a single pre-treatment covariate, $\rho$ is the correlation between the outcome and the pre-treatment covariate within each condition. 
+For many designs, $N$ is large relative to $k$, so that $\frac{k}{(N - 3)\  + \ k} \approx 1$ and the factor becomes about $\sqrt{\left( 1 - \rho^{2} \right)}$ \citep{Bloom1995, Meyvis2017}. 
 We can use this factor to translate the standard error without adjustment into the standard error with adjustment using $\sqrt{\left( 1 - \rho^{2} \right)} \cdot SE_{\widehat{\tau}}^{no\ adj.} = SE_{\widehat{\tau}}^{adj.}$. 
 Alternatively, we can say that adjustment shrinks the standard error (e.g., from Rule \ref{rule:sd-to-se}) by about $\left\lbrack 1 - \sqrt{\left( 1 - \rho^{2} \right)} \right\rbrack \cdot 100\%$.
-We can use this relationship to predict statistical power by plugging in an assumed value for $\rho^{2}$, which I denote as $\widetilde{R^{2}}$.
+We can use this relationship to compute statistical power by plugging in an assumed value for $\rho^{2}$, which I denote as $\widetilde{R^{2}}$.
 As before, we can use a reference population to obtain a suitable value of $\widetilde{R^{2}}$ to adjust the predicted standard error, such as using the $R^{2}$ of a regression of the outcome on the control variables in a similar population.
 
 \begin{restatable}[Adjustment]{rule0}{ruleadjustment}
@@ -484,19 +493,22 @@ It turns out that the effect we can detect with 80\% or 95\% power is determined
 The arms of the 90\% confidence interval are 1.64 standard errors wide. 
 Thus, the power of the study is the percent of the sampling distribution that is larger than 1.64 standard errors. 
 To find the minimum detectable effect, we need to solve for the treatment effect that positions 80\% of the sampling distribution above 1.64. 
-If we plug 0.80 into the inverse of the normal CDF, we obtain $\Phi^{- 1}(0.8)$ = 0.84.\footnote{
+If we plug 0.80 into the inverse of the standard normal CDF, we obtain $\Phi_{std}^{- 1}(0.8)$ = 0.84.\footnote{
   In R, we can use \texttt{qnorm(0.80)}.
   } 
-To position 80\% of the sampling distribution above 1.64 standard errors, the sampling distribution must be centered $(1.64 + 0.84) = 2.48$ standard errors above zero, which we can safely treat as 2.5. For 95\% power, we can compute $(1.64 + \Phi^{- 1}(0.95)) = (1.64 + 1.64) = 3.3$ standard errors (see \citealt{Bloom1995} for further discussion). 
+To position 80\% of the sampling distribution above 1.64 standard errors, the sampling distribution must be centered $(1.64 + 0.84) = 2.48$ standard errors above zero, which we can safely treat as 2.5. For 95\% power, we can compute $(1.64 + \Phi_{std}^{- 1}(0.95)) = (1.64 + 1.64) = 3.3$ standard errors (see \citealt{Bloom1995} for further discussion). 
 Figure 1 shows the logic of this relationship graphically.
 
-\begin{restatable}[SE to MDE]{rule0}{rulesetomde}
+\begin{restatable}[Bloom's Rule; SE to MDE]{rule0}{rulesetomde}
 \label{rule:se-to-mde}
 An experiment has 80\% power to detect a treatment effect that is 2.5 times the standard error and 95\% power to detect a treatment effect that is 3.3 times the standard error.
 \end{restatable}
 
 This rule is also helpful for readers! 
-Even if the authors of a study do not discuss their statistical power, you can quickly predict the minimum detectable effect with 80\% power by multiplying the standard error times 2.5 and the minimum detectable effect with 95\% power by multiplying the standard error times 3.3.
+Even if the authors of a study do not discuss their statistical power, you can quickly compute the minimum detectable effect with 80\% power by multiplying the standard error times 2.5 and the minimum detectable effect with 95\% power by multiplying the standard error times 3.3.
+However, see \cite{Hoenig2001} on the potential dangers of using statistical power as a data analysis tool.\footnote{
+  \citet[5]{Hoenig2001} write: ``power calculations tell us how well we might be able to characterize nature in the future given a particular state and statistical study design, but they cannot use information in the data to tell us about the likely states of nature.''
+}
 
 \begin{figure}
     \centering
@@ -514,7 +526,7 @@ Or we might want to conduct an experiment on the entire population of interest.
 In this context, we simply need to know whether our already-determined sample size provides sufficient statistical power. 
 Rules \ref{rule:sd-to-se}, \ref{rule:adjustment}, and \ref{rule:se-to-mde} allow us to work in this context (as well as Rules \ref{rule:existing-to-se} and \ref{rule:pilot-to-se} below).
 
-As an example, imagine we are planning to replicate of Ahler and Sood's (\citeyear{Ahler2018}) finding that correcting respondents' misperceptions of their out-party reduces affective polarization.
+As an example, imagine we are planning to replicate Ahler and Sood's (\citeyear{Ahler2018}) finding that correcting respondents' misperceptions of their out-party reduces affective polarization.
 If we are planning to replicate the finding on a CES module, then we will have 1,000 respondents total or 500 respondents in the treatment and control conditions. 
 Do 1,000 respondents provide sufficient statistical power?
 
@@ -523,18 +535,12 @@ In their experiment, the treatment has two steps.
 First, Ahler and Sood (1) ask Republicans to report their perceptions of the percent of Democrats with certain demographic attributes and (2) ask Democrats to report their perceptions of the percent of Republicans with certain demographic attributes. 
 After asking respondents to report their perceptions of the out-party, Ahler and Sood provide respondents with the correct information. 
 Compared to a control group that was neither asked their perceptions nor given the correct information, the treatment group evaluated supporters of the out-party more favorably on a 101-point feeling thermometer scale. 
-They estimate a treatment effect of 6.4 points on the 101-point scale with a 95\% confidence interval of [3,
-10]. 
-\cite{Broockman2022} directly replicate
-Ahler and Sood's result and estimate the treatment effect is 3.9 with a 90\% confidence interval of
-[1.1, 6.6].\footnote{\cite{Broockman2022} report a
-  slightly different analysis in the main text of their paper. Most
-  notably, they use the difference between evaluations of the ``people
-  who are'' the in-party and ``people who are'' the out-party. Using
-  their replication data, we run an analysis that treats evaluations of
-  ``people who are'' the out-party as the outcome (instead of the
-  difference). This latter, alternative analysis is similar to Ahler and
-  Sood's approach, so I focus on it here.} 
+They estimate a treatment effect of 6.4 points on the 101-point scale with a 95\% confidence interval of [3, 10]. 
+As part of a much larger study, \cite{Broockman2022} closely replicate Ahler and Sood's result and estimate the treatment effect is 3.9 with a 90\% confidence interval of [1.1, 6.6].\footnote{
+  \cite{Broockman2022} report a slightly different analysis in the main text of their paper. 
+  Most notably, they use the difference between evaluations of the ``people who are'' the in-party and ``people who are'' the out-party. 
+  Using their replication data, I run an analysis that treats evaluations of ``people who are'' the out-party as the outcome (instead of the difference). 
+  This latter, alternative analysis is similar to Ahler and Sood's approach, so I focus on it here.} 
 In both cases, the 90\% confidence interval includes only positive effects, so the authors reject the null hypothesis that the treatment effect is less than or equal to zero and conclude that the treatment has the hypothesized positive effect on the feeling thermometer toward supporters of the out-party.
 
 How could we use features of a reference population along with Rules \ref{rule:sd-to-se}, \ref{rule:adjustment}, and \ref{rule:se-to-mde} to evaluate our study?\footnote{
@@ -551,7 +557,7 @@ In this context, $n = 500$ because we have two experimental conditions and $N = 
 However, we must plug a suitable value for $\widetilde{SD(Y)}$ into the equation. For this application, and many others, we can think of $\widetilde{SD(Y)}$ as the standard deviation of the outcome in the control group (or treatment group if that is easier).
 
 In practice, we can look to standard deviations in reference populations ``like'' our experimental sample.\footnote{In a pinch, we can use the crude rule of thumb that the range of a variable tends to be about four times the standard deviation \citep{Wan2014}, so 101/4 = 25.25, though this rule should be used only as a first approximation, if used at all.} 
-For example, the American National Elections Study (ANES) asks a \emph{similar} survey question. 
+For example, the 2020 American National Elections Study (ANES) asks a \emph{similar} survey question. 
 The ANES version asks respondents to report their feelings toward the Democratic [Republican] party, while Ahler and Sood ask respondents to report their feelings toward \emph{supporters of} the Democratic [Republican] party. 
 The standard deviation of the responses to the similar ANES question is 20.8.
 
@@ -580,7 +586,7 @@ This pre-treatment measure should be \emph{strongly} related to the post-treatme
 If we let $\widetilde{R^{2}} = 40\%$---though we should do additional work to confirm this working assumption\footnote{
   In a small pilot study, \cite{Culter2024} validate a strategy of measuring the feelings toward supporters of the out-party before and after the treatment. 
   In their small pilot with 250 respondents, they find that the pre-treatment measure has an $R^{2}$ of about 73\%. 
-  This suggests that the pre-post strategy will shrink the SE by about 48\%.}---then the standard error will be about $\frac{2 \cdot 20.8 \cdot \sqrt{1 - 0.40}}{\sqrt{2 \cdot 500}} = 1.02$. 
+  This suggests that the pre-post strategy will shrink the standard error by about 48\%.}---then the standard error will be about $\frac{2 \cdot 20.8 \cdot \sqrt{1 - 0.40}}{\sqrt{2 \cdot 500}} = 1.02$. 
 For a standard error of 1.02, we will have 80\% power to detect a treatment effect of $2.5 \cdot SE = 2.5 \cdot 1.02 = 2.55$ points on the 101-point scale and 95\% power to detect a treatment effect of $3.3 \cdot SE = 3.3 \cdot 1.02 = 3.37$ points. 
 This adjustment strategy might make a difference in whether we consider our 1,000-respondent study adequately powered!
 
@@ -592,11 +598,16 @@ To find the sample size that produces our desired minimum detectable effect (i.e
 Suppose we want our experiment to have 80\% power to detect the effect $\widetilde{\tau}$.
 Then we need $\widetilde{\tau} = \frac{SE}{2.5} = \frac{\frac{\widetilde{SD(Y)}}{\sqrt{2 \cdot n}}}{2.5}$.
 Solving for $n$, we find that we will need $2 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ respondents per condition to obtain 80\% power. 
-If we are adjusting for control variables, we need $2 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\tau}} \right)^{2}$ respondents per condition for 80\% power. For 95\% power to detect the effect $\widetilde{\tau}$, the factor changes from 2.5 to 3.3 and we need $2 \cdot \left( \frac{3.3 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ or $2 \cdot \left( \frac{3.3 \cdot \dot{\widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^2} \right)}}}{\widetilde{\tau}} \right)^{2}$ respondents per condition, respectively.\footnote{This leads to another useful rule of thumb, though this one is rough. Suppose that we are interested in effects that are 10\% of a standard deviation. Then the term $\left( \frac{\widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ equals 100, so we can simply multiply the factors $2 \cdot {2.5}^{2} = 12.5$ and $2 \cdot {3.3}^{2} = 21.8$ by 100 to find the required sample sizes of 1,250 and 2,180 per condition to detect these ``small'' effects with 80\% and 95\% power.}
+If we are adjusting for control variables, we need $2 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\tau}} \right)^{2}$ respondents per condition for 80\% power. For 95\% power to detect the effect $\widetilde{\tau}$, the factor changes from 2.5 to 3.3 and we need $2 \cdot \left( \frac{3.3 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ or $2 \cdot \left( \frac{3.3 \cdot \dot{\widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^2} \right)}}}{\widetilde{\tau}} \right)^{2}$ respondents per condition, respectively.\footnote{
+  This leads to another useful rule of thumb, though this one is rough. 
+  Suppose that we are interested in effects that are 10\% of a standard deviation. 
+  (\cite{Lovakov2021} find that about one in five studies have effects smaller than 11\% of a standard deviation.)
+  Then the term $\left( \frac{\widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ equals 100, so we can simply multiply the factors $2 \cdot {2.5}^{2} = 12.5$ and $2 \cdot {3.3}^{2} = 21.8$ by 100 to find the required sample sizes of 1,250 and 2,180 per condition to detect these ``small'' effects with 80\% and 95\% power.
+  }
 
 \begin{restatable}[SD to Sample Size]{rule0}{rulesdtosamplesize}
 \label{rule:sd-to-sample-size}
-We can use features of a reference population to predict the sample size we will need in a planned study. 
+We can use features of a reference population to compute the sample size we will need in a planned study. 
 For 80\% power to detect the treatment effect $\widetilde{\tau}$, the sample size per condition will need to be about $2 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ (or $2 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\tau}} \right)^{2}\ $if including control variables), where $\widetilde{SD(Y)}$ is the standard deviation of the outcome in a reference population and $\widetilde{R^2}$ is the $R^2$ of a regression of the outcome on the control variables in a reference population.
 For 95\% power, the factor changes from 2.5 to 3.3.
 \end{restatable}
@@ -609,6 +620,8 @@ The ratio of two standard errors ${SE}_{\widehat{\tau}}^{A}$ and ${SE}_{\widehat
 The two $\frac{2 \cdot \sigma}{\sqrt{2}}$ cancel and we have $\frac{SE_{\widehat{\tau}}^{A}}{SE_{\widehat{\tau}}^{B}} = \sqrt{\frac{n^{B}}{n^{A}}}$.
 Solving for $SE_{\widehat{\tau}}^{B}$, we have $SE_{\widehat{\tau}}^{B} = \sqrt{\frac{n^{A}}{n^{B}}} \cdot SE_{\widehat{\tau}}^{A}$.
 Thus, if we know the sample size and standard error of an existing study, then we can use the existing study to predict the standard error in our planned study: our standard error will be about $\sqrt{\frac{n^{existing}}{n^{planned}}} \cdot SE_{\widehat{\tau}}^{existing}$.
+Importantly, the existing study should have a similar population, design, and outcome measure. 
+The sample size, treatment, and treatment effect can differ; otherwise the studies should be similar.
 
 \begin{restatable}[Existing Study to SE]{rule0}{ruleexistingtose}
 \label{rule:existing-to-se}
@@ -617,7 +630,7 @@ We can use an existing, similar study to predict the standard error of the estim
 
 \section*{Rule \ref{rule:existing-to-sample-size}: From an Existing Study to the Sample Size}
 
-We can also use an existing study to predict the sample size we need to obtain a desired power level.
+We can also use an existing study to compute the sample size we need to obtain a desired power level.
 From Rule \ref{rule:existing-to-se}, we know that $SE_{\widehat{\tau}}^{planned} = \sqrt{\frac{n^{existing}}{n^{planned}}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{planned}$.
 If we want 80\% power to detect the effect $\widetilde{\tau}$ in our planned study, then we need $SE_{\widehat{\tau}}^{planned} = \ \frac{\widetilde{\tau}}{2.5}$ (see
 Rule \ref{rule:se-to-mde}). Plugging this into Rule \ref{rule:existing-to-se} and solving for $n^{planned}$, we will need about $n^{existing} \cdot \left( \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right)^{2}$ respondents per condition. 
@@ -625,7 +638,7 @@ For 95\% power, we will need about $n^{exisiting} \cdot \left( \frac{3.3}{\widet
 
 \begin{restatable}[Existing Study to Sample Size]{rule0}{ruleexistingtosamplesize}
 \label{rule:existing-to-sample-size}
-We can use an existing, similar study to predict the sample size we will need in a planned study. For 80\% power to detect the treatment effect $\widetilde{\tau}$, we will need about $n^{existing} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right\rbrack^{2}$ respondents per condition, where $n^{existing}$ is the number of respondents per condition in the existing study and $SE_{\widehat{\tau}}^{existing}$ is the estimated standard error in the existing study
+We can use an existing, similar study to compute the sample size we will need in a planned study. For 80\% power to detect the treatment effect $\widetilde{\tau}$, we will need about $n^{existing} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right\rbrack^{2}$ respondents per condition, where $n^{existing}$ is the number of respondents per condition in the existing study and $SE_{\widehat{\tau}}^{existing}$ is the estimated standard error in the existing study
 For 95\% power, the factor changes from 2.5 to 3.3.
 \end{restatable}
 
@@ -633,10 +646,10 @@ For 95\% power, the factor changes from 2.5 to 3.3.
 
 It is common to run a small pilot study prior to the experiment for reasons unrelated to statistical power.\footnote{
   Importantly, one should \textit{not} use pilot data to estimate the treatment effect $\widehat{\tau}$. 
-  Any pilot study will not be sufficiently precise to provide a useful estimate of the treatment effect.
+  Any pilot study will not be sufficiently precise to provide a useful estimate of the treatment effect \cite{Leon2011, Albers2018}.
   }
 For example, we might like to learn whether respondents can accurately remember certain details of a vignette. 
-If we have pilot data available, we can also use these pilot data to predict statistical power. 
+If we have pilot data available, we can also use these pilot data to predict the standard error in the full study. 
 Suppose, for example, that we have tentatively planned to run a full study with 1,000 respondents. 
 We might run a pilot study on 100 respondents to make sure that no issues arise. 
 We can perform the planned analysis on the pilot data and use Rule \ref{rule:existing-to-se} to predict the standard errors (and minimum detectable
@@ -646,13 +659,12 @@ be useful for any purpose.}
 For example, if the small pilot has a standard error of 2.0, then a good guess of the standard error in the full study is $\sqrt{\frac{100}{1,000}} \cdot 2.0 = 0.32 \cdot 2.0 = 0.63$.
 
 However, translating the standard error from a small pilot study is meaningfully different from translating the standard error from another full study. Recall that the standard error estimate from the pilot data is only an \emph{estimate.} 
-And while the standard error estimate is usually accurate, pilot studies are typically small enough to worry about substantially under-estimating the standard error (and thus
-over-estimating power). 
+And while the standard error estimate is usually accurate, pilot studies are typically small enough to worry about the noise in the estimate.
+With a noisy estimate of the standard error, we might happen to substantially under-estimate the standard error (and thus over-estimate power). 
 To protect against running an under-powered study, I recommend predicting the standard error \emph{conservatively} from pilot data. 
 
-To understand how severely you might under-estimate (or over-estimate)
-the standard error using Rule \ref{rule:existing-to-se}, recall the that standard error of a sample standard deviation is about $SE\left( \text{sample SD} \right) = \ \text{sample SD} \cdot \sqrt{\frac{1}{4 \cdot n}}$ so that the factor $\sqrt{\frac{1}{4 \cdot n}} \cdot 100\%$ gives us a typical error in the estimate of the standard error as a percentage. 
-For $N = 100$, the standard error estimate is typically off by about 7\% (either too high or too low), with errors larger than about 14\% being unusual. 
+To understand how severely you might under-estimate (or over-estimate) the standard error using Rule \ref{rule:existing-to-se}, recall the that standard error of a sample standard deviation is about $SE\left( \text{sample SD} \right) = \ \text{sample SD} \cdot \sqrt{\frac{1}{4 \cdot n}}$ so that the factor $\sqrt{\frac{1}{4 \cdot n}} \cdot 100\%$ gives us a typical error in the estimate of the standard error as a percentage. 
+For $n = 100$ respondents per condition, the standard error estimate is typically off by about $\sqrt{\frac{1}{4 \cdot n}} \cdot 100\% = \sqrt{\frac{1}{4 \cdot 50}} \cdot 100\%= 7\%$ (either too high or too low), with errors larger than about 14\% being unusual. 
 To protect against an under-powered study, we can increase the predicted standard error by a factor of $2 \cdot \sqrt{\frac{1}{4 \cdot n}} + 1 = \ \sqrt{\frac{1}{n}} + 1$, which roughly corresponds to the upper bound of a 95\% confidence interval for the standard error. 
 Plugging this conservative standard error into Rule \ref{rule:existing-to-se} above, we obtain $\sqrt{\frac{n^{pilot}}{n^{planned}}}\ \left\lbrack \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack$
 as a \emph{conservative} estimate of the standard error. 
@@ -689,7 +701,7 @@ For simplicity, suppose that we would like 95\% power to detect a treatment effe
 
 Above, we use the ANES to motivate setting $\widetilde{SD(Y)}$ to 20.8 and $\widetilde{R^{2}}$ to 5\%. 
 Rule \ref{rule:sd-to-sample-size} tells us that, without control variables, we will need about $2 \cdot \left( \frac{3.3 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2} = 2 \cdot \left( \frac{3.3 \cdot 20.8}{3} \right)^{2} = 1,050$ respondents per condition for 95\% power. 
-With control variables, this becomes ${2 \cdot \left( \frac{\widetilde{3.3 \cdot SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}{\widetilde{\tau}} \right)}^{2} = 2 \cdot \left( \frac{3.3 \cdot 20.8 \cdot \sqrt{(1 - 0.05)}}{3} \right)^{2} = 995$.
+With control variables that predict the outcome with an $R^2$ of 5\%, this becomes ${2 \cdot \left( \frac{3.3 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}{\widetilde{\tau}} \right)}^{2} = 2 \cdot \left( \frac{3.3 \cdot 20.8 \cdot \sqrt{(1 - 0.05)}}{3} \right)^{2} = 995$.
 
 \subsection*{An Existing Study: \cite{Ahler2018}}
 
@@ -763,7 +775,7 @@ This gives us $SE_{\widehat{\delta}}^{classic} = \ \sqrt{\frac{{4 \cdot \sigma}^
   (accessed May 3, 2024; persistent link:
   \url{https://archive.md/FOTo7}).} 
 
-Two of the rules above change for interactions.
+The standard error for an interaction has a different relationship to the standard deviation, so two of the rules above change for interactions.
 
 \begin{itemize}
 \item 
@@ -778,9 +790,8 @@ Two of the rules above change for interactions.
       Solving for $n$, we find that $n = 4 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\delta}} \right)^{2}$. 
       If we are adjusting for control variables, we have $4 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\delta}} \right)^{2}$. 
       Notice that the first factor changes from 2 in Rule \ref{rule:sd-to-se} to 4 for interaction. 
-      For 95\% power, the factor changes from 2.5 to 3.3.
   \end{itemize}
-\item \textbf{A Modification to Rules \ref{rule:pilot-to-se} and \ref{rule:pilot-to-sample-size}.} Second, Rules \ref{rule:pilot-to-se} and \ref{rule:pilot-to-sample-size} require a small adjustment to account for the change from $N = 2 \cdot n$ in the treatment effect context to $N = 4 \cdot n$ in the interaction context---the SE will be more accurate with a larger total sample size. 
+\item \textbf{A Modification to Rules \ref{rule:pilot-to-se} and \ref{rule:pilot-to-sample-size}.} Second, Rules \ref{rule:pilot-to-se} and \ref{rule:pilot-to-sample-size} require a small adjustment to account for the change from $N = 2 \cdot n$ in the treatment effect context to $N = 4 \cdot n$ in the interaction context---the standard error will be more accurate with a larger total sample size. 
 The adjustment factor changes from $\left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right)$ in the treatment effect context to $\overset{\text{modified}}{\overbrace{\sqrt{\frac{1}{2 \cdot n^{pilot}}}}} + 1$ in the interaction context.
 \end{itemize}
 
@@ -792,7 +803,7 @@ need 16 times the sample size to estimate an interaction than to
 estimate a main effect'' (accessed May 3, 2024; persistent link:
 \url{https://archive.md/FOTo7}). 
 While this rule is too crude to apply generally---it makes strong assumptions about the treatment effect of interest---it does starkly highlight the demands of estimating an interaction relative to the treatment effect. 
-It can help our intuition to partition the Gelman's 16x claim into its constituent parts: you need twice the number of respondents per condition for a similarly precise estimate, twice the number of conditions, and four times the number of respondents when the parameter is half the size.
+It can help our intuition to partition Gelman's 16x claim into its constituent parts: you need twice the number of respondents per condition for a similarly precise estimate, twice the number of conditions, and four times the number of respondents when the parameter is half the size.
 
 \section*{Example: Interactions}
 
@@ -830,11 +841,13 @@ Table \ref{tbl:how} shows how you can use the rules to establish that your plann
 \noindent However, we should not draw strong distinctions between these strategies---the strategies differ only in the order in which the sample size, effect of interest, and statistical power are chosen. 
 In the end, it simply matters that the three components combine to form a well-powered experiment.
 
-To make each of these arguments, we can gather data from a variety of sources.
+To make each of these arguments, we can gather data from three potential sources, ideally relying on multiple.
 
 \begin{enumerate}
 \item \textit{Features of a reference population.} We can find studies that measure our outcome (and perhaps control variables) on a similar population. We can use the standard deviation and $R^2$ in this reference population to predict the standard deviation and $R^2$ in our planned study. 
-\item \textit{Existing similar study.} We can find an existing similar study. We can adjust the standard error estimates in the existing study to predict the standard error in our planned study. It is important that this study mimic the outcome and design of our planned study, though treatment (and treatment effect) can be quite different.
+\item \textit{Existing similar study.} We can find an existing similar study. We can adjust the standard error estimates in the existing study to predict the standard error in our planned study. 
+Importantly, the existing study should have a similar population, design, and outcome measure. 
+The sample size, treatment, and treatment effect can differ; otherwise the studies should be similar.
 \item \textit{Pilot data.} We can use pilot data. We can adjust the standard error estimates from the pilot data to predict the standard error in our planned study. Because the standard error estimates in the pilot data will be quite noisy, we can make a conservative adjustment.
 \end{enumerate}
 
@@ -889,7 +902,7 @@ Throughout the paper, I discuss rules to obtain the minimum detectable effect an
 The rules for 80\% power have a factor of 2.5 that can be changed to 3.3 for 95\% power.
 These factors are the minimum detectable effects, in standard errors (i.e., see Rule \ref{rule:se-to-mde}). 
 What about other power levels? 
-Table \ref{tbl:mdes} provides the minimum detectable effect, in standard errors, for a variety of power levels.\footnote{I round these minimum detectable effects to two significant digits. For greater precision, we can use \texttt{pnorm(0.95) + pnorm(0.80)}, where \texttt{0.80} corresponds to 80\% power and can be changed to the desired power level.} 
+Table \ref{tbl:mdes} provides the minimum detectable effect, in standard errors, for a variety of power levels.\footnote{I round these minimum detectable effects to the nearest tenth. For greater precision, we can use \texttt{pnorm(0.95) + pnorm(0.80)}, where \texttt{0.80} corresponds to 80\% power and can be changed to the desired power level.} 
 We can use these factors rather 2.5 for 80\% power (or 3.3 for 95\% power) in the relevant rules.
 Table \ref{tbl:mdes} also provides the percent change in sample size to change the power from 80\% to various other levels (i.e., see Rule \ref{rule:80-to-95}).
 
@@ -937,7 +950,7 @@ Table \ref{tbl:mdes} also provides the percent change in sample size to change t
 Checking that a 90\% confidence interval contains only values consistent with the research hypothesis corresponds to a size-0.05 test. 
 However, some researchers prefer to use a 95\% confidence interval, which corresponds to size-0.025 test for directional claims. 
 Table \ref{tbl:mdes2} provides the minimum detectable effects for researchers using a 95\% confidence interval.\footnote{
-  I round these minimum detectable effects to two significant digits. 
+  I round these minimum detectable effects to the nearest tenth. 
   For greater precision, we could use \texttt{pnorm(0.975) + pnorm(0.80)}, where \texttt{0.80} corresponds to 80\% power and can be changed to the desired power level.
   } 
 We can use these factors rather 2.5 for 80\% power in the relevant rules. 
@@ -981,10 +994,21 @@ We can use these factors rather 2.5 for 80\% power in the relevant rules.
 \end{tabularx}
 \end{table}
 
+\noindent To achieve the same statistical power with a 95\% confidence interval (which corresponds to a size-0.025 test) compared to a 90\% confidence interval (which corresponds to a size-0.05 test), researchers need to increase their sample size by about 27\% for 80\% power and 20\% for 95\% power.
+
 For example, I noted above that \cite{Ahler2018} have about 268 respondents per condition with a standard error of about 1.8 on the 101-point scale. 
 Suppose researchers want 80\% power to detect a treatment effect of 3 points on the 101-point scale with a 95\% confidence interval.
 Using Rule \ref{rule:existing-to-sample-size} modified for a 95\% confidence interval, researchers would need about $n^{existing} \cdot \left\lbrack \frac{2.8}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right\rbrack^{2} = 268 \cdot \left\lbrack \frac{2.8}{3} \cdot 1.8 \right\rbrack^{2} = 756$ respondents per condition (note the 2.8 in place of the 2.5; using a 90\% confidence interval would require about 555 respondents per condition).
 
+\section*{Related Work}
+
+\cite{Cohen1988} provides the foundational introduction to power analysis, and \cite{Cohen1990} offers an engaging personal and historical perspective.
+\citet[ch. 9]{DeGroot2010} and \citet[ch. 8]{Casella2002} provide a through technical discussion. 
+\cite{Greenland2016} offers an accessible and intuitive discussion organized around potential \textit{mis}understandings of the concepts.
+\cite{Bloom1995} offers a particularly practical and intuitive approach using the minimum detectable effect.
+\cite{Cohen1992}, \cite{Lenth2001}, and \cite{Meyvis2017} also offer practical guides.
+\cite{Lakens2022} offers a broader perspective on sample size justification beyond statistical power.
+\cite{Blair2019, Blair2023} offer a useful conceptual framework and software for comprehensive evaluation of research designs.
 
 \section*{Conclusion}
 
@@ -996,10 +1020,11 @@ Perhaps most importantly, these rules help develop intuitions about statistical 
 For example, these rules can help us quickly appreciate the tradeoffs between spreading survey respondents across eight conditions rather than four, or between using fewer respondents through a more expensive provider or more respondents through less expensive provider.
 
 In this paper, I focused mostly on the choice of sample size, but there are more (and sometimes better!) ways to increase statistical power. 
-While framed as defending null results, \cite{Kane2024} describes several strategies to increase statistical power. 
-And keep Rule \ref{rule:se-to-mde} top of mind. 
 We must get the ratio of the assumed treatment effect and the standard error above 2.5 and ideally above 3.3. 
-Rule \ref{rule:se-to-mde} makes the task clear---we need a treatment with oomph to make the numerator large and strategies like regression adjustment, precise measurement instruments, attentive respondents, and large samples to make the standard error small.
+Rule \ref{rule:se-to-mde} makes the task clear---we need a treatment with oomph to make the numerator large and strategies like regression adjustment, precise measurement instruments, attentive respondents, and large samples to make the standard error small.\footnote{
+  While framed as defending null results, \cite{Kane2024} describes several strategies to increase treatment effects and decrease the standard error.
+  }
+And keep Rule \ref{rule:se-to-mde} top of mind.
 I hope these rules help us think carefully about these efforts.
 
 
