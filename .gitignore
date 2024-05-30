@@ -9,3 +9,4 @@ R/
 *.bbl
 *.log
 *.synctex.gz
+.Rproj.user

@@ -300,7 +300,7 @@ An experiment might use more than two conditions, but for the sake of the discus
   }
 For these two conditions, we want to make inferences about the average treatment effect $\tau = \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1)} - \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0)}$ (which I refer to as a ``treatment effect'' throughout).
 
-To make inferences about $\tau$, we randomly assign $n_{1}$ respondents to treatment and $n_{0}$ respondents to control, where $N = \ n_{1} + n_{0}$.\footnote{
+To make inferences about $\tau$, we randomly assign $n_{1}$ respondents to treatment and $n_{0}$ respondents to control, where $N = n_{1} + n_{0}$.\footnote{
   Note that $N$ represents the \emph{total number of the respondents} in the comparison, while $n_{i}$ represents the number of respondents \emph{in condition} $i$\emph{.}
   Below, I assume equal numbers of respondents in each condition, so I let $n$ represent the number of respondents per condition, which is a convenient quantity when thinking about experimental design and statistical power.
   }
@@ -309,12 +309,12 @@ Then we create the observed outcome $Y_{i} = \mathcal{Y}_{i}\left( D_{i} \right)
 Then we estimate the treatment effect using $\widehat{\tau} = \frac{1}{n_{1}}\sum_{i = 1}^{N}{{D_{i} \cdot Y}_{i}} - \frac{1}{n_{0}}\sum_{i = 1}^{N}{{\left( 1 - D_{i} \right) \cdot Y}_{i}}$, which we compute in practice using least squares estimates of the model $Y_{i} = \alpha + \tau \cdot D_{i} + \epsilon_{i}$. 
 In some cases, we might increase the precision of the estimates by including variables measured pre-treatment as control variables in the regression model.
 
-To estimate the sampling variance of $\widehat{\tau}$, we use Neyman's (\citeyear{Neyman1923}) conservative variance estimator $\widehat{Var}\left( \widehat{\tau} \right) = \ \frac{s_{1}^{2}}{n_{1}} + \ \frac{s_{0}^{2}}{n_{0}}$, where $s_{1}^{2}$ and $s_{0}^{2}$ represent the sample variance in the treatment and the control group, respectively. 
-Then we can estimate the standard error of $\widehat{\tau}$ with ${\widehat{SE}}_{\widehat{\tau}} = \ \sqrt{\widehat{Var}\left( \widehat{\tau} \right)}$.
+To estimate the sampling variance of $\widehat{\tau}$, we use Neyman's (\citeyear{Neyman1923}) conservative variance estimator $\widehat{Var}\left( \widehat{\tau} \right) = \frac{s_{1}^{2}}{n_{1}} + \frac{s_{0}^{2}}{n_{0}}$, where $s_{1}^{2}$ and $s_{0}^{2}$ represent the sample variance in the treatment and the control group, respectively. 
+Then we can estimate the standard error of $\widehat{\tau}$ with ${\widehat{SE}}_{\widehat{\tau}} = \sqrt{\widehat{Var}\left( \widehat{\tau} \right)}$.
 
 In practice, we use a HC2 heteroskedasticity-robust variance estimator (or a closely related variant), which \cite{Samii2012} show is equivalent to Neyman's estimator. 
-For testing, \cite{Li2017} provide several additional (seemingly innocuous) regularity conditions such that a finite-sample version of the central limit theorem holds and $\left\lbrack \widehat{\tau} - \Phi_{std}^{- 1}\left( 1 - \ \frac{\alpha}{2} \right) \cdot {\widehat{SE}}_{\widehat{\tau}},\ \widehat{\tau} + \Phi_{std}^{- 1}\left( 1 - \ \frac{\alpha}{2} \right) \cdot {\widehat{SE}}_{\widehat{\tau}} \right\rbrack$ is an asymptotically conservative $\left( 1 - \ \frac{\alpha}{2} \right) \cdot 100\%\ $ confidence interval. 
-We can use the 90\% confidence interval = $\left\lbrack \widehat{\tau} - 1.64 \cdot {\widehat{SE}}_{\widehat{\tau}},\ \widehat{\tau} + 1.64 \cdot {\widehat{SE}}_{\widehat{\tau}} \right\rbrack$ to conduct size-0.05 tests of directional hypotheses by rejecting a null hypotheses if and only if \emph{all} values in the 90\% confidence interval are consistent with the research hypothesis \citep{Rainey2014, McCaskey2015}.
+For testing, \cite{Li2017} provide several additional (seemingly innocuous) regularity conditions such that a finite-sample version of the central limit theorem holds and $\left\lbrack \widehat{\tau} - \Phi_{std}^{- 1}\left( 1 - \frac{\alpha}{2} \right) \cdot {\widehat{SE}}_{\widehat{\tau}},\widehat{\tau} + \Phi_{std}^{- 1}\left( 1 - \frac{\alpha}{2} \right) \cdot {\widehat{SE}}_{\widehat{\tau}} \right\rbrack$ is an asymptotically conservative $\left( 1 - \frac{\alpha}{2} \right) \cdot 100\%$ confidence interval. 
+We can use the 90\% confidence interval = $\left\lbrack \widehat{\tau} - 1.64 \cdot {\widehat{SE}}_{\widehat{\tau}},\widehat{\tau} + 1.64 \cdot {\widehat{SE}}_{\widehat{\tau}} \right\rbrack$ to conduct size-0.05 tests of directional hypotheses by rejecting a null hypotheses if and only if \emph{all} values in the 90\% confidence interval are consistent with the research hypothesis \citep{Rainey2014, McCaskey2015}.
 
 \section*{Rules \ref{rule:power-int} and \ref{rule:power-z}: What is Statistical Power?}
 
@@ -331,13 +331,13 @@ This sampling distribution is typically centered over the treatment effect (i.e.
 Importantly, the standard deviation of the sampling distribution of $\widehat{\tau}$ is called the \emph{standard error} and ${\widehat{SE}}_{\widehat{\tau}}$ is usually a precise estimator of the standard error.
 
 If the research hypothesis $H_{R}:\tau > 0$ is correct, then the sampling distribution of $\widehat{\tau}$ lies mostly to the right of zero. 
-However, we will only claim that $\tau > 0$ if the entire 90\% confidence interval is larger than zero, or, equivalently, if $\widehat{\tau} - 1.64 \cdot \ {\widehat{SE}}_{\widehat{\tau}} > 0.$
+However, we will only claim that $\tau > 0$ if the entire 90\% confidence interval is larger than zero, or, equivalently, if $\widehat{\tau} - 1.64 \cdot {\widehat{SE}}_{\widehat{\tau}} > 0.$
 This means that we must design our experiment so that the sampling distribution falls relatively far from zero.
 
 We say that the statistical \emph{power} of an experiment is the chance of rejecting the null hypothesis \emph{for a particular treatment effect} $\tau$. 
 For example, we say that an experiment has ``80\% power to detect a treatment effect of \underline{~~~~~}'' if
 $\widehat{\tau} - 1.64 \cdot {\widehat{SE}}_{\widehat{\tau}} > 0$ in 80\% of repeated experiments.
-Similarly, we say that the experiment has ``95\% power to detect a treatment effect of \underline{~~~~~}'' if the $\widehat{\tau} - 1.64\ {\widehat{SE}}_{\widehat{\tau}} > 0$ in 95\% of repeated experiments. 
+Similarly, we say that the experiment has ``95\% power to detect a treatment effect of \underline{~~~~~}'' if the $\widehat{\tau} - 1.64{\widehat{SE}}_{\widehat{\tau}} > 0$ in 95\% of repeated experiments. 
 By convention, 80\% power is the minimal standard for ``adequate'' statistical power \citep{Cohen1988}, but others recommend higher power, such as 95\%.\footnote{
   For example, the \textit{Journal of Politics} ``a power of at least 0.90, ideally 0.95, to detect anticipated/relevant effect sizes'' for registered reports (accessed May 3, 2024; persistent link: \url{https://archive.md/g7YQ3}). 
   \textit{Nature Human Behavior} requires that ``the a priori power must be 0.95 or higher for all proposed hypothesis tests'' for registered reports (accessed May 13, 2024; persistent link: \url{https://archive.md/xpGdj}).
@@ -372,17 +372,17 @@ Thus, computing the power is simply computing the percent of the sampling distri
 
 \begin{restatable}[Power; Most Intuitively]{rule0}{rulepowerint}
 \label{rule:power-int}
-Power equals $1 - \Phi(1.64 \cdot SE;\ \mu = \tau,\ \sigma = SE)$, where $\Phi(z;\ \mu,\ \sigma)$ is the normal CDF, $SE$ is the standard error of the estimated treatment effect, and $\tau$ is the treatment effect.
+Power equals $1 - \Phi(1.64 \cdot SE;\mu = \tau,\sigma = SE)$, where $\Phi(z;\mu,\sigma)$ is the normal CDF, $SE$ is the standard error of the estimated treatment effect, and $\tau$ is the treatment effect.
 \end{restatable}
 
 \noindent See \citet[92]{Gerber2012} for a similar presentation.
 
-Dividing through by the standard error and then subtracting $\frac{\tau}{SE},$ we see that power also equals $1 - \Phi\left( 1.64 - \frac{\tau}{SE};\ \mu = 0,\ \sigma = 1 \right)$; the values of $\Phi\left(z;\ \mu = 0,\ \sigma = 1 \right)$ are provided in common \emph{z} tables, where $z = 1.64 - \frac{\tau}{SE}$. 
+Dividing through by the standard error and then subtracting $\frac{\tau}{SE},$ we see that power also equals $1 - \Phi\left( 1.64 - \frac{\tau}{SE};\mu = 0,\sigma = 1 \right)$; the values of $\Phi\left(z;\mu = 0,\sigma = 1 \right)$ are provided in common \emph{z} tables, where $z = 1.64 - \frac{\tau}{SE}$. 
 This allows us to compute power using the \emph{standard} normal CDF.
 
 \begin{restatable}[Power; From a $z$ Table]{rule0}{rulepowerz}
 \label{rule:power-z}
-Power equals $\ 1 - \Phi_{std}\left( 1.64 - \ \frac{\tau}{SE} \right)$, where $\Phi_{std}(z)$ is the standard normal CDF (as found in a standard $z$ table), $SE$ is the standard error of the estimated treatment effect, and $\tau$ is the treatment effect.
+Power equals $1 - \Phi_{std}\left( 1.64 - \frac{\tau}{SE} \right)$, where $\Phi_{std}(z)$ is the standard normal CDF (as found in a standard $z$ table), $SE$ is the standard error of the estimated treatment effect, and $\tau$ is the treatment effect.
 \end{restatable}
 
 \noindent Rule \ref{rule:power-z} allows us to connect statistical power to the familiar $z$ table in the appendices of many statistics textbooks or the \texttt{pnorm()} function in R.
@@ -436,8 +436,8 @@ We can say that ``our experiment has \underline{~~~~~}\% power to detect a treat
 
 In practice, we can use the standard deviation of the outcome in the population under study to predict the standard error of the estimated treatment effect. 
 To motivate this rule, recall the regression model, $y_{i} = \alpha + \tau D_{i} + \epsilon_{i}$ that allows us to estimate the treatment effect $\tau$ via least squares. 
-By assuming $\epsilon_{i} \sim N\left( 0,\ \sigma^{2} \right)$ we can obtain the classical standard error estimate $SE_{\widehat{\tau}}^{classic} = \sqrt{\frac{\sigma^{2}}{N \cdot \overline{D} \cdot \left( 1 - \overline{D} \right)}}$, where $\overline{D}$ represents the fraction assigned to the treatment group (or the average of the $D_{i}$) and $N$ represents the total sample size in the two conditions. 
-Assuming balanced assignment to treatment and control where $\overline{D} = \frac{1}{2}$ and $n_{1} = n_{0} = n$, we have $SE_{\widehat{\tau}}^{classic} = \sqrt{\frac{\sigma^{2}}{2 \cdot n \cdot \frac{1}{4}}} = \frac{2 \cdot \sigma}{\sqrt{2 \cdot n}}\ $.
+By assuming $\epsilon_{i} \sim N\left( 0,\sigma^{2} \right)$ we can obtain the classical standard error estimate $SE_{\widehat{\tau}}^{classic} = \sqrt{\frac{\sigma^{2}}{N \cdot \overline{D} \cdot \left( 1 - \overline{D} \right)}}$, where $\overline{D}$ represents the fraction assigned to the treatment group (or the average of the $D_{i}$) and $N$ represents the total sample size in the two conditions. 
+Assuming balanced assignment to treatment and control where $\overline{D} = \frac{1}{2}$ and $n_{1} = n_{0} = n$, we have $SE_{\widehat{\tau}}^{classic} = \sqrt{\frac{\sigma^{2}}{2 \cdot n \cdot \frac{1}{4}}} = \frac{2 \cdot \sigma}{\sqrt{2 \cdot n}}$.
 This is a helpful result. 
 We can think of $\sigma$ as the standard deviation of the outcome within each experimental condition. 
 Let $\widetilde{SD(Y)}$ denote an assumption or ``guesstimate'' about the value of $\sigma$. 
@@ -456,7 +456,7 @@ Importantly, $n$ represents the sample size \textit{per condition} (not the tota
 We can use features of a reference population to predict the standard error of the estimated treatment effect in a planned study. The standard error will be about $\frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{2 \cdot n}}$, where $n$ is the sample size per condition and $\widetilde{SD(Y)}$ is the standard deviation of the outcome in a reference population.
 \end{restatable}
 
-Importantly, this prediction relies on the assumption that $\epsilon_{i} \sim N\left( 0,\ \sigma^{2} \right)$, which is not guaranteed by the design. 
+Importantly, this prediction relies on the assumption that $\epsilon_{i} \sim N\left( 0,\sigma^{2} \right)$, which is not guaranteed by the design. 
 In fact, one can easily construct creative examples where classical and robust standard errors diverge substantially. 
 However, the classical standard errors are close enough
 to motivate Rule \ref{rule:sd-to-se}. 
@@ -471,10 +471,10 @@ Thus, while we should prefer robust standard errors in practice, classical stand
 We can sometimes substantially decrease the standard error by adjustment
 for covariates measured pre-treatment. 
 \cite{Clifford2021} suggest a promising strategy of measuring the outcome of interest both before and after the treatment and controlling for the pre-treatment measure of the outcome in the regression model. 
-Using the classical framework from above, \citet[547]{Cox1982} show that regression adjustment using $k$ pre-treatment covariates changes the standard error by a factor of about $\sqrt{\left( 1 - \rho^{2} \right) \cdot \left( 1 + \ \frac{k}{(N - 3)\  + \ k} \right)}$, where $\rho^{2}$ is the population $R^{2}$ for a regression predicting the outcome using the pre-treatment controls within each condition (see also \citealt{Boldt2024}).
+Using the classical framework from above, \citet[547]{Cox1982} show that regression adjustment using $k$ pre-treatment covariates changes the standard error by a factor of about $\sqrt{\left( 1 - \rho^{2} \right) \cdot \left( 1 + \frac{k}{(N - 3) + k} \right)}$, where $\rho^{2}$ is the population $R^{2}$ for a regression predicting the outcome using the pre-treatment controls within each condition (see also \citealt{Boldt2024}).
 In the case of a single pre-treatment covariate, $\rho$ is the correlation between the outcome and the pre-treatment covariate within each condition. 
-For many designs, $N$ is large relative to $k$, so that $\frac{k}{(N - 3)\  + \ k} \approx 1$ and the factor becomes about $\sqrt{\left( 1 - \rho^{2} \right)}$ \citep{Bloom1995, Meyvis2017}. 
-We can use this factor to translate the standard error without adjustment into the standard error with adjustment using $\sqrt{\left( 1 - \rho^{2} \right)} \cdot SE_{\widehat{\tau}}^{no\ adj.} = SE_{\widehat{\tau}}^{adj.}$. 
+For many designs, $N$ is large relative to $k$, so that $\frac{k}{(N - 3) + k} \approx 1$ and the factor becomes about $\sqrt{\left( 1 - \rho^{2} \right)}$ \citep{Bloom1995, Meyvis2017}. 
+We can use this factor to translate the standard error without adjustment into the standard error with adjustment using $\sqrt{\left( 1 - \rho^{2} \right)} \cdot SE_{\widehat{\tau}}^{noadj.} = SE_{\widehat{\tau}}^{adj.}$. 
 Alternatively, we can say that adjustment shrinks the standard error (e.g., from Rule \ref{rule:sd-to-se}) by about $\left\lbrack 1 - \sqrt{\left( 1 - \rho^{2} \right)} \right\rbrack \cdot 100\%$.
 We can use this relationship to compute statistical power by plugging in an assumed value for $\rho^{2}$, which I denote as $\widetilde{R^{2}}$.
 As before, we can use a reference population to obtain a suitable value of $\widetilde{R^{2}}$ to adjust the predicted standard error, such as using the $R^{2}$ of a regression of the outcome on the control variables in a similar population.
@@ -552,7 +552,7 @@ If that minimum detectable effect is sufficiently small, then we will say that o
 
 \subsection*{Without Control Variables: Rules \ref{rule:sd-to-se} and \ref{rule:se-to-mde}}
 
-Using Rule \ref{rule:sd-to-se}, the standard error will be about $\frac{2 \cdot \ \widetilde{SD(Y)}}{\sqrt{2 \cdot n}}$. 
+Using Rule \ref{rule:sd-to-se}, the standard error will be about $\frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{2 \cdot n}}$. 
 In this context, $n = 500$ because we have two experimental conditions and $N = 1,000$ in a CES module. 
 However, we must plug a suitable value for $\widetilde{SD(Y)}$ into the equation. For this application, and many others, we can think of $\widetilde{SD(Y)}$ as the standard deviation of the outcome in the control group (or treatment group if that is easier).
 
@@ -608,7 +608,7 @@ If we are adjusting for control variables, we need $2 \cdot \left( \frac{\dot{2.
 \begin{restatable}[SD to Sample Size]{rule0}{rulesdtosamplesize}
 \label{rule:sd-to-sample-size}
 We can use features of a reference population to compute the sample size we will need in a planned study. 
-For 80\% power to detect the treatment effect $\widetilde{\tau}$, the sample size per condition will need to be about $2 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ (or $2 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\tau}} \right)^{2}\ $if including control variables), where $\widetilde{SD(Y)}$ is the standard deviation of the outcome in a reference population and $\widetilde{R^2}$ is the $R^2$ of a regression of the outcome on the control variables in a reference population.
+For 80\% power to detect the treatment effect $\widetilde{\tau}$, the sample size per condition will need to be about $2 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ (or $2 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\tau}} \right)^{2}$if including control variables), where $\widetilde{SD(Y)}$ is the standard deviation of the outcome in a reference population and $\widetilde{R^2}$ is the $R^2$ of a regression of the outcome on the control variables in a reference population.
 For 95\% power, the factor changes from 2.5 to 3.3.
 \end{restatable}
 \section*{Rule \ref{rule:existing-to-se}: From an Existing Study to the Standard Error}
@@ -632,7 +632,7 @@ We can use an existing, similar study to predict the standard error of the estim
 
 We can also use an existing study to compute the sample size we need to obtain a desired power level.
 From Rule \ref{rule:existing-to-se}, we know that $SE_{\widehat{\tau}}^{planned} = \sqrt{\frac{n^{existing}}{n^{planned}}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{planned}$.
-If we want 80\% power to detect the effect $\widetilde{\tau}$ in our planned study, then we need $SE_{\widehat{\tau}}^{planned} = \ \frac{\widetilde{\tau}}{2.5}$ (see
+If we want 80\% power to detect the effect $\widetilde{\tau}$ in our planned study, then we need $SE_{\widehat{\tau}}^{planned} = \frac{\widetilde{\tau}}{2.5}$ (see
 Rule \ref{rule:se-to-mde}). Plugging this into Rule \ref{rule:existing-to-se} and solving for $n^{planned}$, we will need about $n^{existing} \cdot \left( \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right)^{2}$ respondents per condition. 
 For 95\% power, we will need about $n^{exisiting} \cdot \left( \frac{3.3}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right)^{2}$ respondents per condition.
 
@@ -663,15 +663,15 @@ And while the standard error estimate is usually accurate, pilot studies are typ
 With a noisy estimate of the standard error, we might happen to substantially under-estimate the standard error (and thus over-estimate power). 
 To protect against running an under-powered study, I recommend predicting the standard error \emph{conservatively} from pilot data. 
 
-To understand how severely you might under-estimate (or over-estimate) the standard error using Rule \ref{rule:existing-to-se}, recall the that standard error of a sample standard deviation is about $SE\left( \text{sample SD} \right) = \ \text{sample SD} \cdot \sqrt{\frac{1}{4 \cdot n}}$ so that the factor $\sqrt{\frac{1}{4 \cdot n}} \cdot 100\%$ gives us a typical error in the estimate of the standard error as a percentage. 
-For $n = 100$ respondents per condition, the standard error estimate is typically off by about $\sqrt{\frac{1}{4 \cdot n}} \cdot 100\% = \sqrt{\frac{1}{4 \cdot 50}} \cdot 100\%= 7\%$ (either too high or too low), with errors larger than about 14\% being unusual. 
-To protect against an under-powered study, we can increase the predicted standard error by a factor of $2 \cdot \sqrt{\frac{1}{4 \cdot n}} + 1 = \ \sqrt{\frac{1}{n}} + 1$, which roughly corresponds to the upper bound of a 95\% confidence interval for the standard error. 
-Plugging this conservative standard error into Rule \ref{rule:existing-to-se} above, we obtain $\sqrt{\frac{n^{pilot}}{n^{planned}}}\ \left\lbrack \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack$
+To understand how severely you might under-estimate (or over-estimate) the standard error using Rule \ref{rule:existing-to-se}, recall the that standard error of a sample standard deviation is about $SE\left( \text{sample SD} \right) = \text{sample SD} \cdot \sqrt{\frac{1}{4 \cdot n}}$ so that the factor $\sqrt{\frac{1}{4 \cdot n}} \cdot 100\%$ gives us a typical error in the estimate of the standard error as a percentage. 
+For $n = 50$ respondents per condition, the standard error estimate is typically off by about $\sqrt{\frac{1}{4 \cdot n}} \cdot 100\% = \sqrt{\frac{1}{4 \cdot 50}} \cdot 100\%= 7\%$ (either too high or too low), with errors larger than about 14\% being unusual. 
+To protect against an under-powered study, we can increase the predicted standard error by a factor of $2 \cdot \sqrt{\frac{1}{4 \cdot n}} + 1 = \sqrt{\frac{1}{n}} + 1$, which roughly corresponds to the upper bound of a 95\% confidence interval for the standard error. 
+Plugging this conservative standard error into Rule \ref{rule:existing-to-se} above, we obtain $\sqrt{\frac{n^{pilot}}{n^{planned}}}\left\lbrack \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack$
 as a \emph{conservative} estimate of the standard error. 
 
 \begin{restatable}[Pilot Data to SE]{rule0}{rulepilottose}
 \label{rule:pilot-to-se}
-We can use pilot data to predict the standard error of the estimated treatment effect in a planned study. Conservatively, the standard error will be about $\sqrt{\frac{n^{pilot}}{n^{planned}}}\ \left\lbrack \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack$, where $n^{pilot}$ is the number of respondents per condition in the pilot data, $SE_{\widehat{\tau}}^{pilot}$ is the estimated standard error using the pilot data, and $n^{planned}$ is the number of respondents per condition in the planned study. 
+We can use pilot data to predict the standard error of the estimated treatment effect in a planned study. Conservatively, the standard error will be about $\sqrt{\frac{n^{pilot}}{n^{planned}}}\left\lbrack \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack$, where $n^{pilot}$ is the number of respondents per condition in the pilot data, $SE_{\widehat{\tau}}^{pilot}$ is the estimated standard error using the pilot data, and $n^{planned}$ is the number of respondents per condition in the planned study. 
 \end{restatable}
 
 \section*{Rule \ref{rule:pilot-to-sample-size}: From Pilot Data to the Sample Size}
@@ -679,13 +679,13 @@ We can use pilot data to predict the standard error of the estimated treatment e
 Perhaps most importantly, we can use the logic of Rule \ref{rule:existing-to-sample-size} to make adjustments to the sample size of the planned study. 
 Suppose that we want to design an experiment with 80\% power to detect the effect $\widetilde{\tau}$. 
 By Rule \ref{rule:se-to-mde}, we need the standard error to be $\frac{\widetilde{\tau}}{2.5}$. 
-Using Rule \ref{rule:pilot-to-se}, we can conservatively predict that the standard error will be $\sqrt{\frac{n^{pilot}}{n^{planned}}}\ \left\lbrack \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack$.
+Using Rule \ref{rule:pilot-to-se}, we can conservatively predict that the standard error will be $\sqrt{\frac{n^{pilot}}{n^{planned}}}\left\lbrack \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack$.
 Setting this equal to $\frac{\widetilde{\tau}}{2.5}$ and solving for $n^{planned}$, we can conservatively predict that $n^{pilot} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack^{2}$ respondents per condition will give us 80\% power to detect the effect $\widetilde{\tau}$.
 
 \begin{restatable}[Pilot Data to Sample Size]{rule0}{rulepilottosamplesize}
 \label{rule:pilot-to-sample-size}
 We can use pilot data to conservatively predict the sample size we will need in a planned study. 
-For 80\% power to detect the treatment effect $\widetilde{\tau}$, we will (conservatively) need about $n^{pilot} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack^{2}$ respondents per condition, where $n^{pilot}$ is the number of respondents per condition in the pilot data and $SE_{\widehat{\tau}}^{pilot}$ is the estimated standard error using the pilot data
+For 80\% power to detect the treatment effect $\widetilde{\tau}$, we will (conservatively) need about $n^{pilot} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot \left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack^{2}$ respondents per condition, where $n^{pilot}$ is the number of respondents per condition in the pilot data and $SE_{\widehat{\tau}}^{pilot}$ is the estimated standard error using the pilot data.
 For 95\% power, the factor changes from 2.5 to 3.3.
 \end{restatable}
 
@@ -729,7 +729,7 @@ $n^{pilot} \cdot \left\lbrack \frac{3.3}{\widetilde{\tau}} \cdot \left( \sqrt{\f
 
 In thinking about the tradeoff between 80\% and 95\% power it can be helpful to have a rule connecting sample size requirements. 
 Recall from
-Rule \ref{rule:existing-to-se} that $\frac{SE_{\widehat{\tau}}^{A}}{SE_{\widehat{\tau}}^{B}} = \ \sqrt{\frac{n^{B}}{n^{A}}}$.
+Rule \ref{rule:existing-to-se} that $\frac{SE_{\widehat{\tau}}^{A}}{SE_{\widehat{\tau}}^{B}} = \sqrt{\frac{n^{B}}{n^{A}}}$.
 For an assumed treatment effect $\widetilde{\tau}$, the standard errors that yield 80\% and 95\% power are given by $\frac{\widetilde{\tau}}{2.5}$
 and $\frac{\widetilde{\tau}}{3.3}$, respectively. 
 Then we have $\frac{SE_{\widehat{\tau}}^{A}}{SE_{\widehat{\tau}}^{B}} = \frac{\frac{\widetilde{\tau}}{2.5}}{\frac{\widetilde{\tau}}{3.3}} = \frac{3.3}{2.5} = \sqrt{\frac{n^{B}}{n^{A}}}$.
@@ -749,28 +749,28 @@ The general logic of the rules extends to the interaction, with two minor modifi
 
 Assume a $2 \times 2$ factorial design with two treatments. 
 Then we have potential outcomes $\mathcal{Y}_{i}(1, 1)$ if assigned to both treatments, $\mathcal{Y}_{i}(1,0)$ if assigned to the first treatment, $\mathcal{Y}_{i}(0,1)$ if assigned to the second treatment, and $\mathcal{Y}_{i}(0,0)$ if assigned neither treatment for respondent $i$ of $N$. 
-Then we can define the interaction as $\delta = \left\lbrack \ \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1,\ 1)\ } - \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0,\ 1)} \right\rbrack - \left\lbrack \ \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1,\ 0)\ }- \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0,\ 0)} \right\rbrack$.
+Then we can define the interaction as $\delta = \left\lbrack \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1,1)} - \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0,1)} \right\rbrack - \left\lbrack \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1,0)}- \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0,0)} \right\rbrack$.
 
 Imagine we assign $n$ respondents to each of the four conditions. 
 We create two indicator variables $D_{1}$ and $D_{2}$ that equal 1 if the respondent is assigned to the first and second treatment, respectively, and 0 otherwise. 
-Then we create the observed outcome $Y = \mathcal{Y}\left( D_{1},\ D_{2} \right)$. 
+Then we create the observed outcome $Y = \mathcal{Y}\left( D_{1},D_{2} \right)$. 
 Then we estimate the interaction in practice using least squares estimates of the model
-$Y = \beta_{0} + {\beta_{1} \cdot D}_{1}{{+ \ \beta}_{2} \cdot D}_{2} + \delta \cdot D_{1} \cdot D_{2} + \epsilon$.
+$Y = \beta_{0} + {\beta_{1} \cdot D}_{1}{{+ \beta}_{2} \cdot D}_{2} + \delta \cdot D_{1} \cdot D_{2} + \epsilon$.
 The parameter $\delta$ is the interaction. 
 Inference about this parameter is the same as described above (least squares regression and robust standard errors; inferences about $\delta$ using the 90\% confidence interval). 
-By assuming $\epsilon_{i} \sim N\left( 0,\ \sigma^{2} \right)$, the classical variance for the least squares estimates of the parameter vector $\mathbf{\beta} = \ \lbrack\beta_{0},\ \beta_{1},\ \beta_{2},\ \delta\rbrack'$ is $Var\left( \widehat{\mathbf{\beta}} \right) = \left( \mathbf{X}^{'}\mathbf{X} \right)^{- 1}\sigma^{2}$ for the design matrix $\mathbf{X} = \lbrack 1,\ D_{1},\ D_{2},\ D_{1} \cdot D_{2}\rbrack$. 
+By assuming $\epsilon_{i} \sim N\left( 0,\sigma^{2} \right)$, the classical variance for the least squares estimates of the parameter vector $\mathbf{\beta} = \lbrack\beta_{0},\beta_{1},\beta_{2},\delta\rbrack'$ is $Var\left( \widehat{\mathbf{\beta}} \right) = \left( \mathbf{X}^{'}\mathbf{X} \right)^{- 1}\sigma^{2}$ for the design matrix $\mathbf{X} = \lbrack 1,D_{1},D_{2},D_{1} \cdot D_{2}\rbrack$. 
 The experimental design requires $n$ repetitions of each of the four unique rows of $\mathbf{X}$, which allows us to simplify $\left( \mathbf{X}^{'}\mathbf{X} \right)^{- 1}$ and find that the bottom right element of $\left( \mathbf{X}^{'}\mathbf{X} \right)^{- 1}\sigma^{2}$---the variance of $\widehat{\delta}$---equals $\frac{4}{n}$. 
-This gives us $SE_{\widehat{\delta}}^{classic} = \ \sqrt{\frac{{4 \cdot \sigma}^{2}}{n}} = \frac{2 \cdot \sigma}{\sqrt{n}}$, where $n$ represents the number of respondents assigned to each condition.\footnote{Alternatively, we can think of the estimate of the
+This gives us $SE_{\widehat{\delta}}^{classic} = \sqrt{\frac{{4 \cdot \sigma}^{2}}{n}} = \frac{2 \cdot \sigma}{\sqrt{n}}$, where $n$ represents the number of respondents assigned to each condition.\footnote{Alternatively, we can think of the estimate of the
   interaction effect as the difference in differences of sample means
-  $\widehat{\delta} = \left\lbrack \ {\overline{Y}}_{11}-\ {\overline{Y}}_{01} \right\rbrack - \left\lbrack \ {\overline{Y}}_{10}-\ {\overline{Y}}_{00} \right\rbrack$,
+  $\widehat{\delta} = \left\lbrack {\overline{Y}}_{11}-{\overline{Y}}_{01} \right\rbrack - \left\lbrack {\overline{Y}}_{10}-{\overline{Y}}_{00} \right\rbrack$,
   where ${\overline{Y}}_{11}$ represents the sample average for respondents
   where $D_{1} = 1$ and $D_{2} = 1$ and so on. Assuming
   independence of the sample means, the variance of these differences is
   the sum of the variances of each term, so that
   $Var(\widehat{\delta}$) =
-  $\frac{\sigma^{2}}{n} + \ \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} = \frac{4{\cdot \sigma}^{2}}{n}$.
+  $\frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} = \frac{4{\cdot \sigma}^{2}}{n}$.
   This also give us
-  $SE_{\widehat{\delta}}^{classic} = \ \sqrt{\frac{{4 \cdot \sigma}^{2}}{n}} = \frac{2 \cdot \sigma}{\sqrt{n}}$.
+  $SE_{\widehat{\delta}}^{classic} = \sqrt{\frac{{4 \cdot \sigma}^{2}}{n}} = \frac{2 \cdot \sigma}{\sqrt{n}}$.
   This motivation that Gelman uses in his widely-shared blog post
   (accessed May 3, 2024; persistent link:
   \url{https://archive.md/FOTo7}).} 
@@ -795,7 +795,7 @@ The standard error for an interaction has a different relationship to the standa
 The adjustment factor changes from $\left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right)$ in the treatment effect context to $\overset{\text{modified}}{\overbrace{\sqrt{\frac{1}{2 \cdot n^{pilot}}}}} + 1$ in the interaction context.
 \end{itemize}
 
-Comparing the standard error for the interaction to the standard error for the treatment effect leads to three important observations. First, for the treatment effect, we had $SE_{\widehat{\tau}}^{classic} = \ \sqrt{\frac{\sigma^{2}}{2 \cdot n \cdot \frac{1}{4}}} = \frac{2 \cdot \sigma}{\sqrt{2 \cdot n}} = \ \frac{1}{\sqrt{2}} \cdot \frac{2 \cdot \sigma}{\sqrt{n}}$; thus the standard error for the interaction is $\sqrt{2}$ times larger (about 41\% larger) than the standard error for the treatment effect. In order to make the standard errors the same, we need to double the sample size \textit{in each condition}.
+Comparing the standard error for the interaction to the standard error for the treatment effect leads to three important observations. First, for the treatment effect, we had $SE_{\widehat{\tau}}^{classic} = \sqrt{\frac{\sigma^{2}}{2 \cdot n \cdot \frac{1}{4}}} = \frac{2 \cdot \sigma}{\sqrt{2 \cdot n}} = \frac{1}{\sqrt{2}} \cdot \frac{2 \cdot \sigma}{\sqrt{n}}$; thus the standard error for the interaction is $\sqrt{2}$ times larger (about 41\% larger) than the standard error for the treatment effect. In order to make the standard errors the same, we need to double the sample size \textit{in each condition}.
 Second, the $2 \times 2$ factorial design has twice as many conditions and thus requires twice the sample size in total. 
 Third, the interaction is likely much smaller than the treatment effect. 
 In a widely shared blog post, Andrew Gelman famously suggests that ``you
@@ -824,8 +824,8 @@ They conducted their planned analysis on the pilot data and estimated a standard
 Using Rule \ref{rule:pilot-to-sample-size}, conservatively, the authors would need about $n^{pilot} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot \left( \sqrt{\frac{1}{{2 \cdot n}^{pilot}}} + 1 \right) \cdot {\widehat{SE}}_{\widehat{\tau}}^{pilot} \right\rbrack^{2} = 75 \cdot \left\lbrack \frac{2.5}{0.67} \cdot \left( \sqrt{\frac{1}{2 \cdot 75}} + 1 \right) \cdot 0.40 \right\rbrack^{2} = 195$ respondents per condition (or 780 respondents total) to have 80\% power to detect an interaction of 0.67. 
 For 95\% power, they would need about $75 \cdot \left\lbrack \frac{3.3}{0.67} \cdot \left( \sqrt{\frac{1}{2 \cdot 75}} + 1 \right) \cdot 0.40 \right\rbrack^{2} = 340$ respondents per condition (or 1,360 respondents total) to have 95\% power.\footnote{
   Robbins et al. ultimately used 375 respondents per condition (or 1,500 respondents total). 
-  Using Rule \ref{rule:pilot-to-se}, the authors would conservatively predict the standard error would be about $\sqrt{\frac{n^{pilot}}{n^{planned}}}\  \cdot {\widehat{SE}}_{\widehat{\delta}}^{pilot} = \ \sqrt{\frac{75}{375}} \cdot 0.40 = 0.19$.
-  In the full, 1,500-respondent study, the standard error was 0.18, which suggests a statistical power of about $1 - \ \Phi_{std}\left( 1.64 - \frac{\widetilde{\tau}}{SE} \right) = \ 1 - \Phi_{std}\left( 1.64 - \frac{0.67}{0.18} \right) = \ 98\%$ to detect an interaction of 0.67.
+  Using Rule \ref{rule:pilot-to-se}, the authors would conservatively predict the standard error would be about $\sqrt{\frac{n^{pilot}}{n^{planned}}} \cdot {\widehat{SE}}_{\widehat{\delta}}^{pilot} = \sqrt{\frac{75}{375}} \cdot 0.40 = 0.19$.
+  In the full, 1,500-respondent study, the standard error was 0.18, which suggests a statistical power of about $1 - \Phi_{std}\left( 1.64 - \frac{\widetilde{\tau}}{SE} \right) = 1 - \Phi_{std}\left( 1.64 - \frac{0.67}{0.18} \right) = 98\%$ to detect an interaction of 0.67.
   }
 
 \section*{How to Use the Rules}
@@ -1008,7 +1008,7 @@ Using Rule \ref{rule:existing-to-sample-size} modified for a 95\% confidence int
 \cite{Bloom1995} offers a particularly practical and intuitive approach using the minimum detectable effect.
 \cite{Cohen1992}, \cite{Lenth2001}, and \cite{Meyvis2017} also offer practical guides.
 \cite{Lakens2022} offers a broader perspective on sample size justification beyond statistical power.
-\cite{Blair2019, Blair2023} offer a useful conceptual framework and software for comprehensive evaluation of research designs.
+\cite{Blair2019} and \cite{Blair2023} offer a useful conceptual framework and software for comprehensive evaluation of research designs.
 
 \section*{Conclusion}
 
@@ -1064,7 +1064,7 @@ I hope these rules help us think carefully about these efforts.
 
 \rulepilottosamplesize*
 
-{\noindent \footnotesize \textit{Note: Rule \ref{rule:pilot-to-se} must be modified to handle interaction. See the section ``How Are Interactions Different?''.}}
+{\noindent \footnotesize \textit{Note: Rule \ref{rule:pilot-to-sample-size} must be modified to handle interaction. See the section ``How Are Interactions Different?''.}}
 
 \ruleconvert*
 
