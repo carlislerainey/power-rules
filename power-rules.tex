@@ -176,7 +176,7 @@ urlcolor=blue % color of external links
 
 {\huge \textbf{Power Rules}\symbolfootnote[1]{This essay flows from many discussions with undergraduate students, PhD students, and colleagues. 
 In these discussions, we have thought about power as a minor extension of estimation and inference rather than power as a distinct topic. 
-In this essay, I try to articulate that perspective and help researchers extend their intuitions and expertise with estimation and inference to statistical power. Marco Aviña, Scott Clifford, and Chuck Smith provided valuable comments on earlier drafts.}
+In this essay, I try to articulate that perspective and help researchers extend their intuitions and expertise with estimation and inference to statistical power. Marco Aviña, Scott Clifford, Ryan Powers, and Chuck Smith provided valuable comments on earlier drafts.}
 }
 
 \vspace{0.4cm}
@@ -631,7 +631,7 @@ We can use an existing, similar study to predict the standard error of the estim
 \section*{Rule \ref{rule:existing-to-sample-size}: From an Existing Study to the Sample Size}
 
 We can also use an existing study to compute the sample size we need to obtain a desired power level.
-From Rule \ref{rule:existing-to-se}, we know that $SE_{\widehat{\tau}}^{planned} = \sqrt{\frac{n^{existing}}{n^{planned}}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{planned}$.
+From Rule \ref{rule:existing-to-se}, we know that $SE_{\widehat{\tau}}^{planned} = \sqrt{\frac{n^{existing}}{n^{planned}}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing}$.
 If we want 80\% power to detect the effect $\widetilde{\tau}$ in our planned study, then we need $SE_{\widehat{\tau}}^{planned} = \frac{\widetilde{\tau}}{2.5}$ (see
 Rule \ref{rule:se-to-mde}). Plugging this into Rule \ref{rule:existing-to-se} and solving for $n^{planned}$, we will need about $n^{existing} \cdot \left( \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right)^{2}$ respondents per condition. 
 For 95\% power, we will need about $n^{exisiting} \cdot \left( \frac{3.3}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right)^{2}$ respondents per condition.
