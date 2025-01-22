@@ -174,9 +174,11 @@ urlcolor=blue % color of external links
 
 \begin{center}
 
-{\huge \textbf{Power Rules}\symbolfootnote[1]{This essay flows from many discussions with undergraduate students, PhD students, and colleagues. 
-In these discussions, we have thought about power as a minor extension of estimation and inference rather than power as a distinct topic. 
-In this essay, I try to articulate that perspective and help researchers extend their intuitions and expertise with estimation and inference to statistical power. Marco Aviña, Scott Clifford, Ryan Powers, and Chuck Smith provided valuable comments on earlier drafts.}
+{\huge \textbf{Power Rules}%\symbolfootnote[1]{%This essay flows from many discussions with undergraduate students, PhD students, and colleagues. 
+%In these discussions, we have thought about power as a minor extension of estimation and inference rather than power as a distinct topic. 
+%In this essay, I try to articulate that perspective and help researchers extend their intuitions and expertise with estimation and inference to statistical power. 
+%Marco Aviña, Scott Clifford, Ryan Powers, and Chuck Smith provided valuable comments on earlier drafts.
+%}
 }
 
 \vspace{0.4cm}
@@ -194,8 +196,8 @@ Carlisle Rainey\symbolfootnote[2]{Carlisle Rainey is Associate Professor of Poli
 \today 
 \vspace{5mm}
 
-Draft \textit{very much} in progress. \\
-Comments welcomed! (\href{mailto:crainey@fsu.edu}{crainey@fsu.edu}) \\\vspace{2mm}
+%Draft \textit{very much} in progress. \\
+%Comments welcomed! (\href{mailto:crainey@fsu.edu}{crainey@fsu.edu}) \\\vspace{2mm}
 Get latest version \href{https://github.com/carlislerainey/power-rules/blob/main/power-rules.pdf}{from GitHub}.
 \end{center}
 
@@ -268,10 +270,10 @@ In this paper, I offer several simple rules for assessing statistical power.
 These rules do not require special software or simulation and are motivated from statistical analyses common in political science. 
 I tightly connect the rules for statistical power to the logic of estimation and inference for experimental data in political science (least squares regression, robust standard errors, and confidence intervals).
 There is tremendous value in simple, conceptual rules of thumb---the kind of rules that allow us to predict the statistical power of an experiment with paper, a pencil, and (perhaps also) a pocket calculator.\footnote{
-  My own view is that paper-and-pencil calculations are valuable, for two reasons. 
-  First, predicting statistical power involves a fair amount of guesswork. 
-  Specialized software and simulations bring an air of exactness that does not seem to match the spirit of the task. 
-  With paper-and-pencil calculations, it seems easier to remember that task is to make an informed guess. 
+  Paper-and-pencil calculations are valuable, for two reasons. 
+  First, predicting statistical power involves some guesswork. 
+  Specialized software and simulations bring an air of exactness that does not match the spirit of the task. 
+  With paper-and-pencil calculations, it seems easier to remember that task is to make an informed guess using clear assumptions. 
   Second, paper-and-pencil work constantly reminds us how inputs relate to outputs. 
   Since we are \emph{designing} experiments and have freedom to make different design choices, it can be helpful to be constantly reminded of the relationship between inputs and outputs.
   }
@@ -348,7 +350,7 @@ It turns out that statistical power is determined by the treatment effect and th
 standard error of the estimate. 
 To compute the statistical power of an experiment, we must make assumptions or ``informed guesses'' about certain quantities. 
 I denote these assumed values with tilde. For example, I denote the assumed treatment effect as $\widetilde{\tau}$.\footnote{
-  We have three $\tau$s floating around: the \emph{actual} treatment effect $\tau$, the treatment effect \emph{assumed for the sake of computing power} $\widetilde{\tau}$, and the \emph{estimated} treatment effect $\widehat{\tau}$. 
+  I use three different $\tau$s: the \emph{actual} treatment effect $\tau$, the treatment effect \emph{assumed for the sake of computing power} $\widetilde{\tau}$, and the \emph{estimated} treatment effect $\widehat{\tau}$. 
   I read the tilde notation as ``assumed to compute power.'' 
   For example, I read $\widetilde{\tau}$ as ``the treatment effect assumed
   to compute power.'' 
@@ -646,7 +648,7 @@ For 95\% power, the factor changes from 2.5 to 3.3.
 
 It is common to run a small pilot study prior to the experiment for reasons unrelated to statistical power.\footnote{
   Importantly, one should \textit{not} use pilot data to estimate the treatment effect $\widehat{\tau}$. 
-  Any pilot study will not be sufficiently precise to provide a useful estimate of the treatment effect \cite{Leon2011, Albers2018}.
+  Any pilot study will not be sufficiently precise to provide a useful estimate of the treatment effect \citep{Leon2011, Albers2018}.
   }
 For example, we might like to learn whether respondents can accurately remember certain details of a vignette. 
 If we have pilot data available, we can also use these pilot data to predict the standard error in the full study. 
