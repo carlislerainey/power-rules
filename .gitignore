@@ -5,6 +5,7 @@
 data/
 img/
 papers/
+present/
 R/
 *.bbl
 *.log
