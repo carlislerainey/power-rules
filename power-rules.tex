@@ -185,7 +185,10 @@ urlcolor=blue % color of external links
 \vspace{0.4cm}
 
 
-{\Large\textbf{Practical Statistical Power Calculations}}
+{\Large\textbf{Practical Advice for Computing Power}}
+
+{\Large\textbf{(and Automating with Pilot Data)}}
+
 
 
 
@@ -197,11 +200,8 @@ Carlisle Rainey\symbolfootnote[2]{Carlisle Rainey is Associate Professor of Poli
 \today 
 \vspace{5mm}
 
-%Draft \textit{very much} in progress. \\
-%Comments welcomed! (\href{mailto:crainey@fsu.edu}{crainey@fsu.edu}) \\\vspace{2mm}
+
 Latest version \href{https://osf.io/preprints/osf/5am9q}{here}.
-%Get latest version \href{https://github.com/carlislerainey/power-rules/blob/main/power-rules.pdf}{from GitHub}.
-%Preprint DOI: \href{https://doi.org/10.31219/osf.io/5am9q}{10.31219/osf.io/5am9q}
 \end{center}
 
 \vspace{5mm}
@@ -209,21 +209,17 @@ Latest version \href{https://osf.io/preprints/osf/5am9q}{here}.
 % Abstract
 {\centerline{\textbf{Abstract}}}
 \begin{quote}\noindent
-Recent work emphasizes the importance of statistical power and shows that power in the social sciences tends to be extremely low. 
-In this paper, I offer simple rules that make statistical power more approachable for substantive researchers. 
-The rules describe how researchers can compute power using (1) features of a reference population, (2) an existing study with a similar design and outcome, and/or (3) a pilot study.
-In the case of balanced, between-subjects designs (perhaps controlling for pre-treatment variables), these rules are sufficient for a complete and compelling power analysis for treatment effects and interactions using only paper-and-pencil. 
-For more complex designs, these rules can provide a useful ballpark prediction before turning to specialized software or complex simulations. 
-Most importantly, these rules help researchers develop a sharp intuition about statistical power.
-For example, it can be helpful for readers and researchers to know that experiments have 80\% power to detect effects that are 2.5 times larger than the standard error and how to easily form a conservative prediction of the standard error using pilot data.
-These rules lower the barrier to entry for researchers new to thinking carefully about statistical power and help researchers design powerful, informative experiments.
+Recent work emphasizes the importance of statistical power in the social sciences and shows that power tends to be very low. 
+In this paper, I offer simple rules to compute power for balanced, between-subjects designs, including new advice for using pilot data to automate the power analysis.
+In many cases, these rules are sufficient for a complete, compact, and compelling power analysis for treatment effects and interactions.
+Most importantly, these rules help researchers develop a sharp intuition about statistical power, lower the barrier to entry for researchers new to thinking carefully about statistical power, and help researchers design powerful, informative experiments.
 \end{quote}
 
 % Add quote to first page
 % \epigraph{}
 
 %\begin{center}
-%Manuscript word count:
+%Manuscript word count: 9,879
 %\end{center}
 
 % Remove page number from first page
@@ -269,7 +265,7 @@ In political science, recent conceptual work and statistical software \citep{Bla
 Political scientists lack a gateway between the simple, robust tools of inference using experimental data and the complex, tedious tools that allow complete and careful evaluations of research designs.
 This paper can help create the link.
 
-In this paper, I offer several simple rules for assessing statistical power. 
+In this paper, I offer several simple rules for assessing statistical power.
 These rules do not require special software or simulation and are motivated from statistical analyses common in political science. 
 I tightly connect the rules for statistical power to the logic of estimation and inference for experimental data in political science (least squares regression, robust standard errors, and confidence intervals).
 There is tremendous value in simple, conceptual rules of thumb---the kind of rules that allow us to predict the statistical power of an experiment with paper, a pencil, and (perhaps also) a pocket calculator.\footnote{
@@ -285,10 +281,12 @@ While specialized software and complex simulations are helpful (and essential in
 (2) simple rules allow us to reason fluently about design choices; 
 (3) simple rules can reduce the chance of making big errors by giving us a ballpark starting point even if we ultimately rely on a more sophisticated approach; and
 (4), in many cases, simple rules are sufficient to justify a sample size and simulations and specialized software are unnecessary. 
-In this paper, I walk through several rules to predict the statistical power of an experiment. 
-For simple randomization schemes, these rules are sufficient to demonstrate adequate power for treatment effects and interactions.
+
+In this paper, I walk through several rules to predict the statistical power of an balanced, between-subjects design, including new advice about pilot data.
+For these balanced, between-subjects designs, the rules are sufficient to demonstrate adequate power for treatment effects and interactions. 
 I explain the intuition of each rule, describe how we can use the rule to plan or evaluate a study, and give examples.
 The rules are often sufficient to predict the power for studies of treatment effects and interactions using features of a reference population, existing studies, and/or pilot data.
+Indeed, it is common to collect pilot data in political science (e.g., to conduct a careful manipulation check), and I show how we can use these pilot data to automate the power analysis.
 
 \section*{Review: The Estimation and Inference Framework}
 
@@ -427,7 +425,8 @@ While rules of thumb can be useful as a starting point, they are only a first ap
 \citet[see esp. pp. 261-263]{Lakens2018} and \citet[see esp. pp. 10-13]{Lakens2022} offer helpful further discussion of how we might choose an treatment effect of interest.
 
 Importantly, we should \textit{not} use pilot data to estimate the treatment effect for the purpose of a power analysis \citep{Leon2011, Albers2018}.
-A pilot data set is too small to estimate the treatment effect with sufficient accuracy---the estimate from the pilot data might even have the wrong sign! (Though see \citet{Perugini2014} for a conserative approach and \cite{Lakens2014} on sequential analysis.)
+A pilot data set is too small to estimate the treatment effect with sufficient accuracy---the estimate from the pilot data might even have the wrong sign! 
+(Though see \citet{Perugini2014} for a conserative approach and \cite{Lakens2014} on sequential analysis; and later in this paper, I offer some new guidance for using pilot data to automate the power analysis.) 
 
 Making a thoughtful assumption about the treatment effect is perhaps the most challenging component of a power analysis. 
 We are doing a study to learn about a treatment effect, so it feels uncomfortable to make declarations about the effect beforehand. 
@@ -476,7 +475,8 @@ Thus, while we should prefer robust standard errors in practice, classical stand
 We can sometimes substantially decrease the standard error by adjustment
 for covariates measured pre-treatment. 
 \cite{Clifford2021} suggest a promising strategy of measuring the outcome of interest both before and after the treatment and controlling for the pre-treatment measure of the outcome in the regression model. 
-Using the classical framework from above, \citet[547]{Cox1982} show that regression adjustment using $k$ pre-treatment covariates changes the standard error by a factor of about $\sqrt{\left( 1 - \rho^{2} \right) \cdot \left( 1 + \frac{k}{(N - 3) + k} \right)}$, where $\rho^{2}$ is the population $R^{2}$ for a regression predicting the outcome using the pre-treatment controls within each condition (see also \citealt{Boldt2024}).
+Using the classical framework from above, \citet[547]{Cox1982} show that regression adjustment using $k$ pre-treatment covariates changes the standard error by a factor of about $\sqrt{\left( 1 - \rho^{2} \right) \cdot \left( 1 + \frac{k}{(N - 3) + k} \right)}$, where $\rho^{2}$ is the population $R^{2}$ for a regression predicting the outcome using the pre-treatment controls within each condition. 
+%(see also \citealt{Boldt2024}).
 In the case of a single pre-treatment covariate, $\rho$ is the correlation between the outcome and the pre-treatment covariate within each condition. 
 For many designs, $N$ is large relative to $k$, so that $\frac{k}{(N - 3) + k} \approx 1$ and the factor becomes about $\sqrt{\left( 1 - \rho^{2} \right)}$ \citep{Bloom1995, Meyvis2017}. 
 We can use this factor to translate the standard error without adjustment into the standard error with adjustment using $\sqrt{\left( 1 - \rho^{2} \right)} \cdot SE_{\widehat{\tau}}^{noadj.} = SE_{\widehat{\tau}}^{adj.}$. 
@@ -509,8 +509,8 @@ Figure 1 shows the logic of this relationship graphically.
 An experiment has 80\% power to detect a treatment effect that is 2.5 times the standard error and 95\% power to detect a treatment effect that is 3.3 times the standard error.
 \end{restatable}
 
-This rule is also helpful for readers! 
-Even if the authors of a study do not discuss their statistical power, you can quickly compute the minimum detectable effect with 80\% power by multiplying the standard error times 2.5 and the minimum detectable effect with 95\% power by multiplying the standard error times 3.3.
+This rule is also helpful for \textit{readers} (as opposed to the researchers themselves). 
+Even if the authors of a study do not discuss their statistical power, readers can quickly compute the minimum detectable effect with 80\% power by multiplying the standard error times 2.5 and the minimum detectable effect with 95\% power by multiplying the standard error times 3.3.
 However, see \cite{Hoenig2001} on the potential dangers of using statistical power as a data analysis tool.\footnote{
   \citet[5]{Hoenig2001} write: ``power calculations tell us how well we might be able to characterize nature in the future given a particular state and statistical study design, but they cannot use information in the data to tell us about the likely states of nature.''
 }
@@ -562,7 +562,7 @@ In this context, $n = 500$ because we have two experimental conditions and $N = 
 However, we must plug a suitable value for $\widetilde{SD(Y)}$ into the equation. For this application, and many others, we can think of $\widetilde{SD(Y)}$ as the standard deviation of the outcome in the control group (or treatment group if that is easier).
 
 In practice, we can look to standard deviations in reference populations ``like'' our experimental sample.\footnote{In a pinch, we can use the crude rule of thumb that the range of a variable tends to be about four times the standard deviation \citep{Wan2014}, so 101/4 = 25.25, though this rule should be used only as a first approximation, if used at all.} 
-For example, the 2020 American National Elections Study (ANES) asks a \emph{similar} survey question. 
+For example, the 2020 American National Elections Study (ANES) asks a similar survey question. 
 The ANES version asks respondents to report their feelings toward the Democratic [Republican] party, while Ahler and Sood ask respondents to report their feelings toward \emph{supporters of} the Democratic [Republican] party. 
 The standard deviation of the responses to the similar ANES question is 20.8.
 
@@ -593,7 +593,7 @@ If we let $\widetilde{R^{2}} = 40\%$---though we should do additional work to co
   In their small pilot with 250 respondents, they find that the pre-treatment measure has an $R^{2}$ of about 73\%. 
   This suggests that the pre-post strategy will shrink the standard error by about 48\%.}---then the standard error will be about $\frac{2 \cdot 20.8 \cdot \sqrt{1 - 0.40}}{\sqrt{2 \cdot 500}} = 1.02$. 
 For a standard error of 1.02, we will have 80\% power to detect a treatment effect of $2.5 \cdot SE = 2.5 \cdot 1.02 = 2.55$ points on the 101-point scale and 95\% power to detect a treatment effect of $3.3 \cdot SE = 3.3 \cdot 1.02 = 3.37$ points. 
-This adjustment strategy might make a difference in whether we consider our 1,000-respondent study adequately powered!
+This adjustment strategy might make a difference in whether we consider our 1,000-respondent study adequately powered.
 
 \section*{Rule \ref{rule:sd-to-sample-size}: From the SD to the Sample Size}
 
@@ -616,38 +616,46 @@ We can use features of a reference population to compute the sample size we will
 For 80\% power to detect the treatment effect $\widetilde{\tau}$, the sample size per condition will need to be about $2 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ (or $2 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\tau}} \right)^{2}$if including control variables), where $\widetilde{SD(Y)}$ is the standard deviation of the outcome in a reference population and $\widetilde{R^2}$ is the $R^2$ of a regression of the outcome on the control variables in a reference population.
 For 95\% power, the factor changes from 2.5 to 3.3.
 \end{restatable}
-\section*{Rule \ref{rule:existing-to-se}: From an Existing Study to the Standard Error}
+
+\section*{Rule \ref{rule:existing-to-se}: From an Existing Study to the Standard Error (for a Direct Replication)}
+
+In some cases, our planned study is a direct replication of an existing study.
+In these cases, we can use the standard error of the existing study to predict the standard error of our planned replication.
 
 The square root law tells us that the standard error depends on the sample size by a factor of $\frac{1}{\sqrt{n}}$. 
 For example, the classical standard errors that I use to motivate these rules have the form $SE_{\widehat{\tau}}^{classic} = \frac{2 \cdot \sigma}{\sqrt{2 \cdot n}} = \frac{2 \cdot \sigma}{\sqrt{2}} \cdot \frac{1}{\sqrt{n}}$.
-This implies a useful relationship between two studies A and B that vary in their sample size.\footnote{Or less exactly, but more usefully, two \emph{similar} studies that vary in their sample size.} 
+This implies a useful relationship between two studies A and B that vary in their sample size.
 The ratio of two standard errors ${SE}_{\widehat{\tau}}^{A}$ and ${SE}_{\widehat{\tau}}^{B}$ with sample sizes $n^{A}$ and $n^{B}$ per condition, respectively, has the form $\frac{SE_{\widehat{\tau}}^{A}}{SE_{\widehat{\tau}}^{B}} = \frac{\frac{2 \cdot \sigma}{\sqrt{{2 \cdot n}^{A}}}}{\frac{2 \cdot \sigma}{\sqrt{{2 \cdot n}^{B}}}}$.
 The two $\frac{2 \cdot \sigma}{\sqrt{2}}$ cancel and we have $\frac{SE_{\widehat{\tau}}^{A}}{SE_{\widehat{\tau}}^{B}} = \sqrt{\frac{n^{B}}{n^{A}}}$.
 Solving for $SE_{\widehat{\tau}}^{B}$, we have $SE_{\widehat{\tau}}^{B} = \sqrt{\frac{n^{A}}{n^{B}}} \cdot SE_{\widehat{\tau}}^{A}$.
-Thus, if we know the sample size and standard error of an existing study, then we can use the existing study to predict the standard error in our planned study: our standard error will be about $\sqrt{\frac{n^{existing}}{n^{planned}}} \cdot SE_{\widehat{\tau}}^{existing}$.
-Importantly, the existing study should have a similar population, design, and outcome measure. 
-The sample size, treatment, and treatment effect can differ; otherwise the studies should be similar.
+Thus, if we know the sample size and standard error of an existing study, then we can use the existing study to predict the standard error in our planned direct replication: our standard error will be about $\sqrt{\frac{n^{existing}}{n^{planned}}} \cdot SE_{\widehat{\tau}}^{existing}$.
 
 \begin{restatable}[Existing Study to SE]{rule0}{ruleexistingtose}
 \label{rule:existing-to-se}
-We can use an existing, similar study to predict the standard error of the estimated treatment effect in a planned study. The standard error will be about $\sqrt{\frac{n^{existing}}{n^{planned}}} \cdot SE_{\widehat{\tau}}^{existing}$, where $n^{existing}$ is the number of respondents per condition in the existing study, $SE_{\widehat{\tau}}^{existing}$ is the estimated standard error in the existing study, and $n^{planned}$ is the number of respondents per condition in the planned study. 
+We can use an existing study to predict the standard error of the estimated treatment effect in a planned replication. The standard error will be about $\sqrt{\frac{n^{existing}}{n^{planned}}} \cdot SE_{\widehat{\tau}}^{existing}$, where $n^{existing}$ is the number of respondents per condition in the existing study, $SE_{\widehat{\tau}}^{existing}$ is the estimated standard error in the existing study, and $n^{planned}$ is the number of respondents per condition in the planned replication. 
 \end{restatable}
 
-\section*{Rule \ref{rule:existing-to-sample-size}: From an Existing Study to the Sample Size}
+But how ``close'' does the replication need to be to the original study? 
+Technically, we need two assumptions to hold: (1) same design and estimator (always a balanced, between-subjects design with optional regression adjustment in our case), (2a) the treatment groups should have the same standard deviation of the outcome (or residuals in the case of regression adjustment) in the existing and planned study, and (2b) the control groups should have the same standard deviation of the outcome (or residuals in the case of regression adjustment in the existing and planned study.
+In practice, these assumptions seem to safely hold when we have (1) the same design and estimator, (2) a similar population (e.g., same survey provider), and (3) an identical outcome measure.
+For example, we should NOT use this rule if (1) the original study used an unbalanced design and the planned study uses a balanced design, (2) the original study used regression adjustment and the planned study does not, (3) the original study used YouGov and the planned study uses MTurk, or (4) the original study used a seven-point Likert scale and the planned study uses a five-point Likert scale.
+We \textit{can} safely use this rule if the treatment differs somewhat between the studies, as long as the new treatment does not result in a meaningfully different standard deviation in the outcome measure (or residuals) compared to the original treatment.
 
-We can also use an existing study to compute the sample size we need to obtain a desired power level.
+\section*{Rule \ref{rule:existing-to-sample-size}: From an Existing Study to the Sample Size (for a Direct Replication)}
+
+We can also use an existing study to compute the sample size we need to obtain a desired power level for a direct replication.
 From Rule \ref{rule:existing-to-se}, we know that $SE_{\widehat{\tau}}^{planned} = \sqrt{\frac{n^{existing}}{n^{planned}}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing}$.
-If we want 80\% power to detect the effect $\widetilde{\tau}$ in our planned study, then we need $SE_{\widehat{\tau}}^{planned} = \frac{\widetilde{\tau}}{2.5}$ (see
+If we want 80\% power to detect the effect $\widetilde{\tau}$ in our planned replication, then we need $SE_{\widehat{\tau}}^{planned} = \frac{\widetilde{\tau}}{2.5}$ (see
 Rule \ref{rule:se-to-mde}). Plugging this into Rule \ref{rule:existing-to-se} and solving for $n^{planned}$, we will need about $n^{existing} \cdot \left( \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right)^{2}$ respondents per condition. 
 For 95\% power, we will need about $n^{exisiting} \cdot \left( \frac{3.3}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right)^{2}$ respondents per condition.
 
 \begin{restatable}[Existing Study to Sample Size]{rule0}{ruleexistingtosamplesize}
 \label{rule:existing-to-sample-size}
-We can use an existing, similar study to compute the sample size we will need in a planned study. For 80\% power to detect the treatment effect $\widetilde{\tau}$, we will need about $n^{existing} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right\rbrack^{2}$ respondents per condition, where $n^{existing}$ is the number of respondents per condition in the existing study and $SE_{\widehat{\tau}}^{existing}$ is the estimated standard error in the existing study
+We can use an existing study to compute the sample size we will need in a planned replication. For 80\% power to detect the treatment effect $\widetilde{\tau}$, we will need about $n^{existing} \cdot \left\lbrack \frac{2.5}{\widetilde{\tau}} \cdot {\widehat{SE}}_{\widehat{\tau}}^{existing} \right\rbrack^{2}$ respondents per condition, where $n^{existing}$ is the number of respondents per condition in the existing study and $SE_{\widehat{\tau}}^{existing}$ is the estimated standard error in the existing study
 For 95\% power, the factor changes from 2.5 to 3.3.
 \end{restatable}
 
-\section*{Rule \ref{rule:pilot-to-se}: From Pilot Data to the SE}
+\section*{Rule \ref{rule:pilot-to-se}: From Pilot Data to the SE (for a Replication)}
 
 It is common to run a small pilot study prior to the experiment for reasons unrelated to statistical power.\footnote{
   Importantly, one should \textit{not} use pilot data to estimate the treatment effect $\widehat{\tau}$. 
@@ -657,13 +665,14 @@ For example, we might like to learn whether respondents can accurately remember 
 If we have pilot data available, we can also use these pilot data to predict the standard error in the full study. 
 Suppose, for example, that we have tentatively planned to run a full study with 1,000 respondents. 
 We might run a pilot study on 100 respondents to make sure that no issues arise. 
-We can perform the planned analysis on the pilot data and use Rule \ref{rule:existing-to-se} to predict the standard errors (and minimum detectable
+Since the planned study is a direct replication of the pilot, we can perform the planned analysis on the pilot data and use Rule \ref{rule:existing-to-se} to predict the standard errors (and minimum detectable
 effect) in the full study.\footnote{We should not pay attention to the
 point estimates in the pilot data; the point estimates are too noisy to
 be useful for any purpose.} 
 For example, if the small pilot has a standard error of 2.0, then a good guess of the standard error in the full study is $\sqrt{\frac{100}{1,000}} \cdot 2.0 = 0.32 \cdot 2.0 = 0.63$.
 
-However, translating the standard error from a small pilot study is meaningfully different from translating the standard error from another full study. Recall that the standard error estimate from the pilot data is only an \emph{estimate.} 
+However, translating the standard error from a small pilot study is meaningfully different from translating the standard error from another full study. 
+Recall that the standard error estimate for any study is only an \emph{estimate}. 
 And while the standard error estimate is usually accurate, pilot studies are typically small enough to worry about the noise in the estimate.
 With a noisy estimate of the standard error, we might happen to substantially under-estimate the standard error (and thus over-estimate power). 
 To protect against running an under-powered study, I recommend predicting the standard error \emph{conservatively} from pilot data. 
@@ -776,7 +785,8 @@ This gives us $SE_{\widehat{\delta}}^{classic} = \sqrt{\frac{{4 \cdot \sigma}^{2
   $\frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} = \frac{4{\cdot \sigma}^{2}}{n}$.
   This also give us
   $SE_{\widehat{\delta}}^{classic} = \sqrt{\frac{{4 \cdot \sigma}^{2}}{n}} = \frac{2 \cdot \sigma}{\sqrt{n}}$.
-  This motivation that Gelman uses in his widely-shared blog post
+  This motivation that Andrew Gelman uses in his widely-shared blog post suggesting that ``you
+need 16 times the sample size to estimate an interaction''
   (accessed May 3, 2024; persistent link:
   \url{https://archive.md/FOTo7}).} 
 
@@ -794,7 +804,7 @@ The standard error for an interaction has a different relationship to the standa
       Then we need $\widetilde{\delta} = 2.5 \cdot SE = 2.5 \cdot \frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{n}}$. 
       Solving for $n$, we find that $n = 4 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\delta}} \right)^{2}$. 
       If we are adjusting for control variables, we have $4 \cdot \left( \frac{\dot{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{\left( 1 - \widetilde{R^{2}} \right)}}}{\widetilde{\delta}} \right)^{2}$. 
-      Notice that the first factor changes from 2 in Rule \ref{rule:sd-to-se} to 4 for interaction. 
+      For an interaction, notice that the first factor changes from 2 to 4 in Rule \ref{rule:sd-to-sample-size}. 
   \end{itemize}
 \item \textbf{A Modification to Rules \ref{rule:pilot-to-se} and \ref{rule:pilot-to-sample-size}.} Second, Rules \ref{rule:pilot-to-se} and \ref{rule:pilot-to-sample-size} require a small adjustment to account for the change from $N = 2 \cdot n$ in the treatment effect context to $N = 4 \cdot n$ in the interaction context---the standard error will be more accurate with a larger total sample size. 
 The adjustment factor changes from $\left( \sqrt{\frac{1}{n^{pilot}}} + 1 \right)$ in the treatment effect context to $\overset{\text{modified}}{\overbrace{\sqrt{\frac{1}{2 \cdot n^{pilot}}}}} + 1$ in the interaction context.
@@ -850,9 +860,8 @@ To make each of these arguments, we can gather data from three potential sources
 
 \begin{enumerate}
 \item \textit{Features of a reference population.} We can find studies that measure our outcome (and perhaps control variables) on a similar population. We can use the standard deviation and $R^2$ in this reference population to predict the standard deviation and $R^2$ in our planned study. 
-\item \textit{Existing similar study.} We can find an existing similar study. We can adjust the standard error estimates in the existing study to predict the standard error in our planned study. 
-Importantly, the existing study should have a similar population, design, and outcome measure. 
-The sample size, treatment, and treatment effect can differ; otherwise the studies should be similar.
+\item \textit{Existing study.} We can find an existing study that uses the same design and estimator, population, and outcome measure. We can adjust the standard error estimates in the existing study to predict the standard error in our planned study.
+The sample size and treatment can differ; otherwise the studies should be identical (or very nearly so).
 \item \textit{Pilot data.} We can use pilot data. We can adjust the standard error estimates from the pilot data to predict the standard error in our planned study. Because the standard error estimates in the pilot data will be quite noisy, we can make a conservative adjustment.
 \end{enumerate}
 
@@ -872,7 +881,7 @@ The sample size, treatment, and treatment effect can differ; otherwise the studi
 \cline{3-5}
  &  & control variables & $SD(Y)$ and $R^2$ of control variables in reference population & Rule \ref{rule:sd-to-se} $\rightarrow$ Rule \ref{rule:adjustment} $\rightarrow$ Rule \ref{rule:se-to-mde} \\
  \cline{2-5}
- & existing similar study & — & estimated standard error from existing study & Rule \ref{rule:existing-to-se} $\rightarrow$ Rule \ref{rule:se-to-mde} \\
+ & existing study & — & estimated standard error from existing study & Rule \ref{rule:existing-to-se} $\rightarrow$ Rule \ref{rule:se-to-mde} \\
  \cline{2-5}
  & pilot data & — & estimated standard error from pilot data & Rule \ref{rule:pilot-to-se} $\rightarrow$ Rule \ref{rule:se-to-mde} \\
 \cline{1-5}
@@ -882,7 +891,7 @@ The sample size, treatment, and treatment effect can differ; otherwise the studi
 \cline{3-5}
  &  & control variables & $SD(Y)$ and $R^2$ of control variables in reference population & Rule \ref{rule:sd-to-se} $\rightarrow$ Rule \ref{rule:adjustment} $\rightarrow$ Rule \ref{rule:power-z} \\
  \cline{2-5}
- & existing similar study & — & estimated standard error from existing study & Rule \ref{rule:existing-to-se} $\rightarrow$ Rule \ref{rule:power-z} \\
+ & existing study & — & estimated standard error from existing study & Rule \ref{rule:existing-to-se} $\rightarrow$ Rule \ref{rule:power-z} \\
  \cline{2-5}
  & pilot data & — & estimated standard error from pilot data & Rule \ref{rule:pilot-to-se} $\rightarrow$ Rule \ref{rule:power-z} \\
 \cline{1-5}
@@ -891,7 +900,7 @@ The sample size, treatment, and treatment effect can differ; otherwise the studi
 \cline{3-5}
  &  & control variables & $SD(Y)$ and $R^2$ of control variables in reference population & Rule \ref{rule:sd-to-sample-size} \\
  \cline{2-5}
- & existing similar study & — & estimated standard error from existing study & Rule \ref{rule:existing-to-sample-size} \\
+ & existing study & — & estimated standard error from existing study & Rule \ref{rule:existing-to-sample-size} \\
  \cline{2-5}
  & pilot data & — & estimated standard error from pilot data & Rule \ref{rule:pilot-to-sample-size} \\
 \hline
@@ -1008,23 +1017,26 @@ Using Rule \ref{rule:existing-to-sample-size} modified for a 95\% confidence int
 \section*{Related Work}
 
 \cite{Cohen1988} provides the foundational introduction to power analysis, and \cite{Cohen1990} offers an engaging personal and historical perspective.
-\citet[ch. 9]{DeGroot2010} and \citet[ch. 8]{Casella2002} provide a through technical discussion. 
+\citet[ch. 9]{DeGroot2010} and \citet[ch. 8]{Casella2002} provide a thorough technical discussion. 
 \cite{Greenland2016} offers an accessible and intuitive discussion organized around potential \textit{mis}understandings of the concepts.
 \cite{Bloom1995} offers a particularly practical and intuitive approach using the minimum detectable effect.
 \cite{Cohen1992}, \cite{Lenth2001}, and \cite{Meyvis2017} also offer practical guides.
+\cite{Rainey2014}, \cite{McCaskey2015}, and \citet[see esp. pp. 261-263]{Lakens2018} discuss the smallest effects of substantive interest, and \cite{Lovakov2021} offer empirical rules for effect sizes derived from social psychology.
+\citet{Perugini2014} offer an alternative approach to automate power analysis using pilot data, and \cite{Lakens2014} introduces sequential analysis.
 \cite{Lakens2022} offers a broader perspective on sample size justification beyond statistical power.
 \cite{Blair2019} and \cite{Blair2023} offer a useful conceptual framework and software for comprehensive evaluation of research designs.
+
 
 \section*{Conclusion}
 
 To address the problem of low power in political science research \citep{ArelBundock2022} and increasing requirements that articles, registered reports, and grant applications include a power analysis, I offer several useful rules that help political scientists reason about statistical power. 
-For simple randomized experiments to estimate treatment effects and/or interactions, these rules might be sufficient to justify a sample size.
-For more complex designs, these rules can serve as a starting point for more complex simulations.
+For simple randomized experiments to estimate treatment effects and/or interactions, these rules can be sufficient to justify a sample size.
+For those researchers with pilot data, I offer new advice to use pilot data to automate the power analysis.
 
 Perhaps most importantly, these rules help develop intuitions about statistical power. 
 For example, these rules can help us quickly appreciate the tradeoffs between spreading survey respondents across eight conditions rather than four, or between using fewer respondents through a more expensive provider or more respondents through less expensive provider.
 
-In this paper, I focused mostly on the choice of sample size, but there are more (and sometimes better!) ways to increase statistical power. 
+In this paper, I focused mostly on the choice of sample size, but there are more (and sometimes better) ways to increase statistical power. 
 We must get the ratio of the assumed treatment effect and the standard error above 2.5 and ideally above 3.3. 
 Rule \ref{rule:se-to-mde} makes the task clear---we need a treatment with oomph to make the numerator large and strategies like regression adjustment, precise measurement instruments, attentive respondents, and large samples to make the standard error small.\footnote{
   While framed as defending null results, \cite{Kane2024} describes several strategies to increase treatment effects and decrease the standard error.
