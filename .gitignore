@@ -1,0 +1,29 @@
+# local only (not on GitHub)
+-old/
+html-version/
+replication-archive-helpers/
+
+# 163 MB, over GitHub's 100 MB limit for a file; it is in the copy of the replication
+# archive on Dataverse, https://doi.org/10.7910/DVN/EMLFBT
+replication-archive/data/anes_timeseries_cdf_csv_20260205.csv
+
+# generated
+__pycache__/
+
+# LaTeX's intermediate files, in this folder only (replication-archive/run.log is part
+# of the archive)
+/*.aux
+/*.bbl
+/*.bcf
+/*.blg
+/*.fdb_latexmk
+/*.fls
+/*.log
+/*.out
+/*.run.xml
+/*.synctex.gz
+
+# the operating system and editors
+.DS_Store
+.Rproj.user/
+.quarto/

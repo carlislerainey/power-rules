@@ -1,0 +1,405 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendix to "Power Rules: Practical Advice for Computing Statistical Power"
+% The main text is power-rules.tex, and this file has the same layout;
+% the bibliography is bibliography.bib.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt]{article}
+
+% Page and fonts
+\usepackage{fullpage}
+\usepackage{setspace}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern} % Latin Modern: Computer Modern, as in the earlier preprint, with T1 accents
+\usepackage[nopatch]{microtype}
+\usepackage[table]{xcolor}
+\usepackage[labelsep=period,font=small]{caption} % "Table 3." as in the PA class
+
+% Packages the manuscript loads (as in the PA preamble)
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{mathtools} % loads amsmath; provides \mathclap
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{textcomp} % for \textrightarrow
+\usepackage{tabularx}
+
+% Citations and references: the same style and options as the PA class
+\usepackage[authordate-trad,noibid,backend=biber,natbib,footmarkoff]{biblatex-chicago}
+\addbibresource{bibliography.bib}
+
+\usepackage{hyperref}
+\usepackage{xurl} % long URLs break anywhere, rather than stretch the spaces in the line
+\hypersetup{
+  pdftitle={Appendix to Power Rules: Practical Advice for Computing Statistical Power},
+  pdfauthor={Carlisle Rainey},
+  colorlinks,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue!50!black
+}
+
+% Headings
+\usepackage{titlesec}
+\titleformat{\section}
+ {\normalfont\sffamily\Large\bfseries}
+ {\thesection}{1em}{}
+\titleformat{\subsection}
+ {\normalfont\sffamily\bfseries}
+ {\thesubsection}{1em}{}
+
+% Appendix sections print as "Appendix 1", as in the PA class
+\makeatletter
+\renewcommand\appendix{\par
+  \setcounter{section}{0}%
+  \setcounter{subsection}{0}%
+  \gdef\thesection{Appendix \@arabic\c@section}%
+  \titleformat{\section}{\normalfont\sffamily\Large\bfseries}{\thesection.}{1em}{}%
+}
+\makeatother
+
+% Floats: allow a page of floats rather than holding tables to the end
+\let\origtable\table
+\let\endorigtable\endtable
+\renewenvironment{table}[1][]{\origtable[htbp]}{\endorigtable}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+
+% Table header rows (\headrow in the PA class): no gray fill in the booktabs style
+\newcommand{\headrow}{}
+
+% Rule environment (as in the PA preamble)
+\usepackage{mdframed}
+\usepackage{amsthm}
+\usepackage{thmtools}
+
+\declaretheoremstyle[
+  headfont=\normalfont\bfseries,
+  bodyfont=\normalfont,
+  notefont=\normalfont\bfseries,
+  postheadspace=0.5em,
+  headpunct={:},
+  spacebelow=\medskipamount,
+  spaceabove=\medskipamount,
+  mdframed={
+    nobreak=true,
+    linecolor=gray!20,
+    backgroundcolor=gray!10,
+    linewidth=0.5pt,
+    roundcorner=5pt,
+    innertopmargin=5pt,
+    innerbottommargin=5pt,
+    innerrightmargin=5pt,
+    innerleftmargin=5pt
+  }
+]{mytheoremstyle}
+\declaretheorem[name=Rule, style=mytheoremstyle]{rule0}
+
+% Lists (as in the PA class and preamble)
+\usepackage{enumitem}
+\renewcommand{\theenumi}{\arabic{enumi}.}
+\renewcommand{\labelenumi}{\theenumi}
+\renewcommand{\theenumii}{\alph{enumii}.}
+\renewcommand{\labelenumii}{\theenumii}
+\setlist{noitemsep,leftmargin=\parindent}
+\setlist{nolistsep}
+
+\long\def\symbolfootnote[#1]#2{\begingroup%
+\def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup}
+
+\begin{document}
+
+\begin{center}
+{\Large \textbf{Appendix to}}
+
+\vspace{0.4cm}
+
+{\huge \textbf{Power Rules}}
+
+\vspace{0.4cm}
+
+{\Large\textbf{Practical Advice for Computing Statistical Power}}
+
+\vspace{1cm}
+
+Carlisle Rainey\symbolfootnote[2]{Carlisle Rainey is Professor of Political Science, Florida State University, 540 Bellamy, Tallahassee, FL, 32306. (\href{mailto:crainey@fsu.edu}{crainey@fsu.edu}).}
+\end{center}
+
+\vspace{5mm}
+
+\thispagestyle{empty}
+
+\doublespace
+
+\appendix
+% Tables 1 and 2 are in the main text
+\setcounter{table}{2}
+
+\section{Extensions for Different Tests}\label{app:tests}
+
+\subsection*{What If I Want Power Other Than 80\% or 95\%?}
+
+Throughout the paper, I discuss rules to obtain the minimum detectable effect and required sample size for 80\% or 95\% power.
+The rules for 80\% power have a factor of 2.5 that can be changed to 3.3 for 95\% power.
+These factors are the minimum detectable effects, in standard errors (see Rule~\ref{rule:se-to-mde}).
+What about other power levels?
+Table~\ref{tbl:mdes} provides the minimum detectable effect, in standard errors, for a variety of power levels.\footnote{I round these minimum detectable effects to the nearest tenth. For greater precision, we can use \texttt{qnorm(0.95) + qnorm(0.80)}, where \texttt{0.80} corresponds to 80\% power and can be changed to the desired power level. The percent changes in sample size use the unrounded factors.}
+We can use these factors rather than 2.5 for 80\% power (or 3.3 for 95\% power) in the relevant rules.
+Table~\ref{tbl:mdes} also provides the percent change in sample size to change the power from 80\% to various other levels (see Rule~\ref{rule:80-to-95}).
+
+\begin{table}[h]
+\centering
+\caption{This table shows the minimum detectable effect, in standard errors, for a variety of power levels. We can use these values to find the minimum detectable effect for power levels other than 80\% and 95\% (as in Rule~\ref{rule:se-to-mde}). We can also use these factors rather than 2.5 for 80\% power (or 3.3 for 95\% power) in the relevant rules. For convenience, this table also shows the percent change in sample size required to change the statistical power from 80\% to the various levels.}\label{tbl:mdes}
+\footnotesize % Making the font smaller
+\renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}} % Centering and middle aligning text in X columns
+\setlength{\extrarowheight}{4pt} % Adding a little extra vertical padding to cells
+\begin{tabularx}{\linewidth}{XXX} % Using tabularx to make the table fit the page width
+\toprule
+\headrow \textbf{Power} & \textbf{Minimum Detectable Effect (in Standard Errors)} & \textbf{Percent Change in Sample Size from 80\% Power} \\
+\midrule
+%10\%   & 0.4 & -98\% \\
+%\hline
+20\%   & 0.8 & $-$90\% \\
+%30\%   & 1.1 & -80\% \\
+%\hline
+40\%   & 1.4 & $-$69\% \\
+%50\%   & 1.6 & -56\% \\
+%\hline
+60\%   & 1.9 & $-$42\% \\
+%70\%   & 2.2 & -24\% \\
+%\hline
+\textbf{80\%}   & \textbf{2.5} & \textbf{0\%} \\
+90\%   & 2.9 & 39\% \\
+\textbf{95\%}   & \textbf{3.3} & \textbf{75\%} \\
+98\%   & 3.7 & 121\% \\
+99\%   & 4.0 & 155\% \\
+99.9\%  & 4.7 & 263\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection*{What If I Want to Use a 95\% Confidence Interval?}
+
+The main text introduces the two-sided test, which is equivalent to a 95\% confidence interval and corresponds to a size-0.025 test for directional claims.
+Table~1 gives its factors at 80\% and 95\% power, and Table~\ref{tbl:mdes2} extends them to other power levels as the two-sided counterpart of Table~\ref{tbl:mdes}.\footnote{
+  I round these minimum detectable effects to the nearest tenth.
+  For greater precision, we can use \texttt{qnorm(0.975) + qnorm(0.80)}, where \texttt{0.80} corresponds to 80\% power and can be changed to the desired power level. The percent changes in sample size use the unrounded factors.
+  }
+We can use these factors rather than 2.5 for 80\% power in the relevant rules.
+
+\begin{table}[h]
+\centering
+\caption{This table is an alternative version of Table~\ref{tbl:mdes} for researchers who wish to use a 95\% confidence interval rather than a 90\% confidence interval. The table shows the minimum detectable effect, in standard errors, for a variety of power levels. We can use these values to find the minimum detectable effect for power levels other than 80\% and 95\% (as in Rule~\ref{rule:se-to-mde}). We can also use these factors rather than 2.5 for 80\% power (or 3.3 for 95\% power) in the relevant rules. For convenience, this table also shows the percent change in sample size required to change the statistical power from 80\% to the various levels.}\label{tbl:mdes2}
+\footnotesize % Making the font smaller
+\renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}} % Centering and middle aligning text in X columns
+\setlength{\extrarowheight}{4pt} % Adding a little extra vertical padding to cells
+\begin{tabularx}{\linewidth}{XXX} % Using tabularx to make the table fit the page width
+\toprule
+\headrow \textbf{Power} & \textbf{Minimum Detectable Effect (in Standard Errors)} & \textbf{Percent Change in Sample Size from 80\% Power} \\
+\midrule
+%10\%   & 0.7 & -94\% \\
+%\hline
+20\%   & 1.1 & $-$84\% \\
+%30\%   & 1.4 & -74\% \\
+%\hline
+40\%   & 1.7 & $-$63\% \\
+%50\%   & 2.0 & -51\% \\
+%\hline
+60\%   & 2.2 & $-$38\% \\
+%70\%   & 2.5 & -21\% \\
+%\hline
+\textbf{80\%}   & \textbf{2.8} & \textbf{0\%} \\
+90\%   & 3.2 & 34\% \\
+\textbf{95\%}   & \textbf{3.6} & \textbf{66\%} \\
+98\%   & 4.0 & 105\% \\
+99\%   & 4.3 & 134\% \\
+99.9\%  & 5.1 & 225\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+To achieve the same statistical power with a 95\% confidence interval (which corresponds to a size-0.025 test) compared to a 90\% confidence interval (which corresponds to a size-0.05 test), researchers need to increase their sample size by about 27\% for 80\% power and 20\% for 95\% power.
+
+
+\section{Extensions for Different Designs}\label{app:designs}
+
+The rules in the main text apply to balanced, between-subjects random assignment with respondents assigned to treatment and control independently.
+The following extensions adapt the rules to common departures from these design assumptions and to hypotheses about interactions.
+
+\subsection*{What If My Design Is Unbalanced?}
+
+Rule~\ref{rule:sd-to-se} assumes balanced assignment to treatment and control.\footnote{
+  Rule~\ref{rule:sd-to-se} also assumes that the variance of the outcome is similar in the treatment and control conditions. When this assumption fails dramatically, balanced assignment is no longer the most efficient design.
+}
+We sometimes assign a fraction $p \neq \frac{1}{2}$ of the $N$ respondents to treatment, perhaps because the treatment is costly or scarce.
+In that case, we can multiply the standard error prediction from Rule~\ref{rule:sd-to-se} (computed with $n = N/2$) by an inflation factor of $\frac{1}{\sqrt{4 \cdot p \cdot \left( 1 - p \right)}}$ (\citealp[61]{Gerber2012}; \citealp[550--551, 553--554]{Bloom1995}).
+Modest imbalance is forgiving.
+A 60/40 split inflates the standard error by about 2\%, and a 70/30 split inflates it by about 9\%.
+More severe imbalance is consequential.
+An 80/20 split inflates the standard error by about 25\%, and a 90/10 split inflates it by about 67\%.
+When planning an unbalanced design, we can apply this inflation factor to the standard error from Rule~\ref{rule:sd-to-se} and then proceed through the remaining rules as usual.
+For Rule~\ref{rule:sd-to-sample-size}, we multiply $\widetilde{SD(Y)}$ by the inflation factor; Rule~\ref{rule:sd-to-sample-size} then returns $n = N/2$, and we assign $p \cdot N$ respondents to treatment and $\left( 1 - p \right) \cdot N$ to control.
+
+\subsection*{What If Respondents Are Assigned in Clusters?}
+
+Rule~\ref{rule:sd-to-se} assumes that respondents are assigned to treatment and control independently.
+In some experiments, respondents are instead assigned in clusters, so that an entire household, classroom, or precinct receives the same condition.
+Assuming clusters are of roughly equal size, clustered assignment inflates the standard error by a factor of $\sqrt{1 + \left( m - 1 \right) \cdot \rho_{ICC}}$, where $m$ is the number of \textit{sampled} respondents per cluster and $\rho_{ICC}$ is the intraclass correlation of the outcome \citep[20--22]{Hayes2017}.
+When we sample only some members of each natural cluster, $m$ is the number sampled, not the size of the natural cluster.
+The intraclass correlation captures the similarity of respondents within a cluster (and even small values can be consequential!).
+For modest clustering where $m = 20$ and $\rho_{ICC} = 0.05$, the inflation factor is $\sqrt{1 + 19 \cdot 0.05} \approx 1.4$.
+Because the required sample size scales with the square of the standard error, this 40\% inflation roughly doubles the sample size that Rule~\ref{rule:sd-to-sample-size} would suggest (assuming that we are adding clusters rather than respondents per cluster).
+When planning a clustered design, we can use a reference population to obtain a guesstimate $\widetilde{\rho}_{ICC}$, apply the resulting inflation factor to the standard error from Rule~\ref{rule:sd-to-se}, and then proceed through the remaining rules as usual.
+When we analyze the data, we cluster the standard errors at the level of assignment.
+
+\subsection*{What If I Use Blocked Random Assignment?}
+
+Blocked random assignment is design-stage covariate adjustment \citep[109--115]{Gerber2012}.
+If we know respondents' covariate values before randomization, we can group similar respondents into blocks and randomize treatment within them, rather than relying on analysis-stage adjustment as in Rule~\ref{rule:adjustment}.
+The logic of Rule~\ref{rule:adjustment} carries over.
+Blocking on a covariate shrinks the standard error by about $\left[ 1 - \sqrt{1 - \widetilde{R^{2}}} \right] \cdot 100\%$, where $\widetilde{R^{2}}$ is the $R^{2}$ of a regression of the outcome on indicators for the blocks in a reference population.
+We can use Rule~\ref{rule:adjustment} with this interpretation of $\widetilde{R^{2}}$ to compute the precision gain from blocking, provided that the analysis includes these indicators.
+
+
+\subsection*{What If I Test an Interaction?}
+
+The rules in the main text focus on a hypothesis about the treatment effect (i.e., ``average treatment effect'' or ATE).
+But what if we have a hypothesis about an \emph{interaction} (i.e., a difference in treatment effects across two scenarios)?
+The general logic of the rules extends to the interaction, with two minor modifications.
+
+Assume a $2 \times 2$ factorial design with two treatments.
+Then we have potential outcomes $\mathcal{Y}_{i}(1,1)$ if assigned to both treatments, $\mathcal{Y}_{i}(1,0)$ if assigned to the first treatment, $\mathcal{Y}_{i}(0,1)$ if assigned to the second treatment, and $\mathcal{Y}_{i}(0,0)$ if assigned to neither treatment for respondent $i$ of $N$.
+Then we can define the interaction as $\delta = \left\lbrack \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1,1)} - \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0,1)} \right\rbrack - \left\lbrack \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(1,0)}- \frac{1}{N}\sum_{i = 1}^{N}{\mathcal{Y}_{i}(0,0)} \right\rbrack$.
+
+Imagine we assign $n$ respondents to each of the four conditions.
+We create two indicator variables $D_{1i}$ and $D_{2i}$ that equal 1 if respondent $i$ is assigned to the first and second treatment, respectively, and 0 otherwise.
+Then we create the observed outcome $Y_{i} = \mathcal{Y}_{i}\left( D_{1i},D_{2i} \right)$.
+Then we estimate the interaction in practice using least squares estimates of the model
+$Y_{i} = \beta_{0} + \beta_{1} \cdot D_{1i} + \beta_{2} \cdot D_{2i} + \delta \cdot D_{1i} \cdot D_{2i} + \epsilon_{i}$.
+The parameter $\delta$ is the interaction.
+Inference about this parameter is the same as described in the main text (least squares regression and robust standard errors; inferences about $\delta$ using the 90\% confidence interval).
+Assuming that the errors share a common variance $\sigma^{2}$, the classical standard error for $\widehat{\delta}$ works out to $SE_{\widehat{\delta}}^{classic} = \frac{2 \cdot \sigma}{\sqrt{n}}$, where $\sigma$ is the standard deviation of the outcome within each condition (as in Rule~\ref{rule:sd-to-se}) and $n$ represents the number of respondents assigned to each condition.\footnote{
+  Two derivations give the same result. First, the classical variance for the least squares estimates of the parameter vector $\boldsymbol{\beta} = \lbrack\beta_{0},\beta_{1},\beta_{2},\delta\rbrack'$ is $Var\left( \widehat{\boldsymbol{\beta}} \right) = \left( \mathbf{X}^{'}\mathbf{X} \right)^{-1}\sigma^{2}$ for the design matrix $\mathbf{X} = \lbrack 1,D_{1},D_{2},D_{1} \cdot D_{2}\rbrack$. The experimental design requires $n$ repetitions of each of the four unique rows of $\mathbf{X}$, which allows us to simplify $\left( \mathbf{X}^{'}\mathbf{X} \right)^{-1}$ and find that the bottom right element of $\left( \mathbf{X}^{'}\mathbf{X} \right)^{-1}\sigma^{2}$---the variance of $\widehat{\delta}$---equals $\frac{4 \cdot \sigma^2}{n}$, so $SE_{\widehat{\delta}}^{classic} = \sqrt{\frac{4 \cdot \sigma^{2}}{n}} = \frac{2 \cdot \sigma}{\sqrt{n}}$.
+  Alternatively, we can think of the estimate of the interaction effect as the difference in differences of sample means $\widehat{\delta} = \left\lbrack {\overline{Y}}_{11}-{\overline{Y}}_{01} \right\rbrack - \left\lbrack {\overline{Y}}_{10}-{\overline{Y}}_{00} \right\rbrack$, where ${\overline{Y}}_{11}$ represents the sample average for respondents where $D_{1i} = 1$ and $D_{2i} = 1$ and so on. Assuming independence of the sample means, the variance of these differences is the sum of the variances of each term, so that $Var(\widehat{\delta}) = \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} + \frac{\sigma^{2}}{n} = \frac{4 \cdot \sigma^{2}}{n}$, so $SE_{\widehat{\delta}}^{classic} = \frac{2 \cdot \sigma}{\sqrt{n}}$. This is the motivation behind Gelman's 16$\times$ claim discussed below.
+  }
+
+The standard error for an interaction has a different relationship to the standard deviation, so Rules~\ref{rule:sd-to-se} and~\ref{rule:sd-to-sample-size} change for interactions.
+Rules~\ref{rule:sd-to-se} and~\ref{rule:sd-to-sample-size} help us use features of a reference population to predict the standard error for the estimate of a treatment effect and approximate the required sample size, respectively.
+When estimating an interaction rather than a treatment effect, we need to adjust these approximations.
+\begin{itemize}
+    \item First, Rule~\ref{rule:sd-to-se} requires adjustment. As explained above, the standard error for the estimated interaction is about $\frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{n}}$ rather than $\frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{2 \cdot n}}$ for the treatment effect.
+    \item Second, Rule~\ref{rule:sd-to-sample-size} requires adjustment.
+    Suppose we want our experiment to have 80\% power to detect the interaction $\widetilde{\delta}$.
+    Then we need $\widetilde{\delta} = 2.5 \cdot SE = 2.5 \cdot \frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{n}}$.
+    Solving for $n$, we find that $n = 4 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\delta}} \right)^{2}$.
+    If we are adjusting for control variables, we have $4 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{1 - \widetilde{R^{2}}}}{\widetilde{\delta}} \right)^{2}$.
+    For an interaction, notice that the first factor changes from 2 to 4 in Rule~\ref{rule:sd-to-sample-size}.
+    The two-sided factors apply here as well, replacing 2.5 and 3.3 with 2.8 and 3.6 (Table~1).
+\end{itemize}
+
+Comparing the standard error for the interaction to the standard error for the treatment effect leads to three important observations. 
+First, for the treatment effect, we had $SE_{\widehat{\tau}}^{classic} = \sqrt{\frac{\sigma^{2}}{2 \cdot n \cdot \frac{1}{4}}} = \frac{2 \cdot \sigma}{\sqrt{2 \cdot n}} = \frac{1}{\sqrt{2}} \cdot \frac{2 \cdot \sigma}{\sqrt{n}}$; thus the standard error for the interaction is $\sqrt{2}$ times larger (about 41\% larger) than the standard error for the treatment effect. 
+In order to make the standard errors the same, we need to double the sample size \textit{in each condition}.
+Second, the $2 \times 2$ factorial design has \textit{twice as many conditions}.
+Combining these first two points, a $2 \times 2$ factorial design needs \textit{four times the total sample size} of a comparable two-arm study to estimate the interaction as precisely as that study estimates its treatment effect, because we double the sample size in each condition and then double the number of conditions.
+Third, the interaction is likely much smaller than the treatment effect.
+In a widely shared blog post, Andrew Gelman famously suggests that ``you
+need 16 times the sample size to estimate an interaction than to
+estimate a main effect'' (accessed October~20, 2026; \href{https://web.archive.org/web/20260926051552/https://statmodeling.stat.columbia.edu/2018/03/15/need16/}{persistent link}).
+While this rule is too crude to apply generally (it assumes that the interaction is half the size of the main effect), it does starkly highlight the demands of estimating an interaction relative to the treatment effect.
+It can help our intuition to partition Gelman's 16$\times$ claim into its constituent parts: we need twice the number of respondents per condition for a similarly precise estimate, twice the number of conditions, and four times the number of respondents when the parameter is half the size.
+
+\subsection*{Example: Interactions}
+
+\citet{Robbins2024} study how respondents evaluate in-party legislators who criticize an out-party president following a covert operation.
+They hypothesize that Republicans, for example, will report higher approval of Republican legislators who are more critical of the Democratic president, but that this effect will be much larger when the operation fails than when the operation succeeds.
+To test their hypothesis, they design a $2 \times 2$ factorial experiment.
+In each condition, a vignette describes (1) a covert operation that succeeds or fails and (2) legislators who aggressively criticize or ignore the operation.
+
+Informed by \citet{Myrick2020}, the authors expected that criticism would increase approval by about 0.33 points on a seven-point scale when the operation succeeded, but by about 1.00 points when the operation failed.
+This implies an interaction of about 0.67 points.
+
+\citet{Myrick2020} conducted a similar experiment and measured her outcomes similarly.
+After analyzing her data closely, \citet{Robbins2024} expected their seven-point approval outcome would have a standard deviation of about 2.0.
+Using Rule~\ref{rule:sd-to-sample-size} (modified for interactions), the authors would need about $4 \cdot \left( \frac{2.5 \cdot 2.0}{0.67} \right)^{2} = 223$ respondents per condition (or 892 respondents in total) for 80\% power to detect an interaction of 0.67.
+For 95\% power, the authors would need about $4 \cdot \left( \frac{3.3 \cdot 2.0}{0.67} \right)^{2} = 389$ respondents per condition (or 1,556 respondents in total).
+By comparison, a two-arm study to detect a treatment effect of 0.67 points with the same standard deviation would need only about $2 \cdot \left( \frac{2.5 \cdot 2.0}{0.67} \right)^{2} = 112$ respondents per condition (or 224 in total) for 80\% power, so testing the interaction roughly quadruples the required sample size.
+
+\section{Simonsohn's (2015) $d_{33}$ and Small Telescopes}\label{app:telescopes}
+
+\citet{Simonsohn2015} offers the quantity $d_{33}$ as a diagnostic that characterizes the set of effects a study cannot meaningfully examine.
+He defines $d_{33}$ as the effect that a study has 33\% power to detect.
+A study with a substantively large $d_{33}$ is, in the spirit of Simonsohn's analogy, a ``small telescope'' because it has less than a 33\% chance of detecting some substantively large effects.
+
+In our framework, $d_{33}$ is just the minimum detectable effect with 33\% power.
+It is helpful to connect $d_{33}$ to our rules.
+Because Simonsohn computes $d_{33}$ in the two-sided convention (a 95\% confidence interval, as in Table~1), we replace the 1.64 threshold with 1.96 and find $d_{33} = (1.96 + \Phi_{std}^{-1}(1/3)) \cdot SE \approx 1.5 \cdot SE$.
+This $d_{33}$ is roughly half of the 80\% MDE of about 2.8 standard errors (under this same two-sided convention).
+
+Consider a study with $SE = 0.05$.
+The MDE at 80\% power is about $2.8 \times 0.05 = 0.14$ and $d_{33}$ is about $1.5 \times 0.05 = 0.08$.
+The study is well-powered to detect effects larger than 0.14.
+Extending Simonsohn's analogy, studies (with $SE = 0.05$) in which 0.08 is a substantively large effect are small telescopes.
+For these studies, a null finding is not a compelling argument in favor of ``no effect'' (see \citealt{Rainey2014} and \citealt{Lakens2018} for further discussion of equivalence tests and ruling out non-zero effects).
+
+Simonsohn also uses $d_{33}$ to suggest a replication sample size.
+Suppose an original study reports an effect, and we want to use a replication study to assess whether that study was a small telescope.
+A replication would test the null hypothesis that the effect equals the original study's $d_{33}$ (against the one-sided alternative that the effect is \emph{smaller than} $d_{33}$).
+To select a sample size for the replication, we assume the true effect is zero and find the sample size needed for 80\% power to reject $d_{33}$.
+The required standard error is $SE^{rep} \leq d_{33}/2.5$ (which is the same condition that Rule~\ref{rule:se-to-mde} imposes for detecting an effect of size $d_{33}$).
+Using $d_{33} \approx 1.5 \cdot SE^{orig}$, we obtain $SE^{rep} \leq 0.6 \cdot SE^{orig}$.
+Because the standard error scales inversely with the square root of the sample size, the replication needs about $\left(\frac{1}{0.6}\right)^2 = 2.8$ times the original sample.\footnote{This is close to Simonsohn's well-known 2.5$\times$ rule. Without the intermediate rounding, $d_{33} \approx 1.53 \cdot SE^{orig}$, and the divisor from Rule~\ref{rule:se-to-mde} is 2.48, yielding a multiplier of about 2.6.}
+
+The $d_{33}$ diagnostic illustrates an important takeaway---the same logic that helps us prospectively design new studies also helps us assess existing studies (e.g., from the main text, we can multiply an existing study's $SE$ by 2.5 and compare that to our judgments about meaningful and negligible effects).
+
+\section{The Rules}\label{app:rules}
+
+\begin{rule0}[Power; Most Intuitively]
+\label{rule:power-int}
+Power equals $1 - \Phi(1.64 \cdot SE;\mu = \tau,\sigma = SE)$, where $\Phi(z;\mu,\sigma)$ is the normal CDF, $SE$ is the standard error of the estimated treatment effect, and $\tau$ is the treatment effect.
+\end{rule0}
+\begin{rule0}[Power; From a $z$ Table]
+\label{rule:power-z}
+Power equals $1 - \Phi_{std}\left( 1.64 - \frac{\tau}{SE} \right)$, where $\Phi_{std}(z)$ is the standard normal CDF (as found in a standard $z$ table), $SE$ is the standard error of the estimated treatment effect, and $\tau$ is the treatment effect.
+\end{rule0}
+
+{\noindent \footnotesize\textit{Note: For a two-sided test, Rules~\ref{rule:power-int} and~\ref{rule:power-z} use 1.96 in place of 1.64.}}
+
+\begin{rule0}[SD to SE]
+\label{rule:sd-to-se}
+We can use features of a reference population to predict the standard error of the estimated treatment effect in a planned study. The standard error will be about $\frac{2 \cdot \widetilde{SD(Y)}}{\sqrt{2 \cdot n}}$, where $n$ is the sample size per condition and $\widetilde{SD(Y)}$ is the standard deviation of the outcome in a reference population.
+\end{rule0}
+
+{\noindent \footnotesize\textit{Note: Rule~\ref{rule:sd-to-se} must be modified for interactions and for unbalanced or clustered assignment. See~\ref{app:designs}.}}
+
+\begin{rule0}[Adjustment]
+\label{rule:adjustment}
+We can use features of a reference population to predict how much regression adjustment using pre-treatment control variables will shrink the standard error of an unadjusted estimate in a planned study. Regression adjustment will shrink the standard error of the unadjusted estimate by about $\left\lbrack 1 - \sqrt{1 - \widetilde{R^{2}}} \right\rbrack \cdot 100\%$, where $\widetilde{R^2}$ is the $R^2$ of a regression of the outcome on the control variables in a reference population.
+\end{rule0}
+
+\begin{rule0}[Bloom's Rule; SE to MDE]
+\label{rule:se-to-mde}
+An experiment has 80\% power to detect a treatment effect that is 2.5 times the standard error and 95\% power to detect a treatment effect that is 3.3 times the standard error.
+\end{rule0}
+
+{\noindent \footnotesize \textit{Note: Rule~\ref{rule:se-to-mde} can be modified to compute the minimum detectable effect for power other than 80\% and 95\%. See Table~\ref{tbl:mdes}. It can also be modified for researchers using 95\% confidence intervals rather than 90\% confidence intervals as I recommend. See Table~\ref{tbl:mdes2}. For a two-sided test, the factors are 2.8 and 3.6. The four headline factors are collected in Table~1.}}
+
+\begin{rule0}[SD to Sample Size]
+\label{rule:sd-to-sample-size}
+We can use features of a reference population to compute the sample size we will need in a planned study.
+For 80\% power to detect the treatment effect $\widetilde{\tau}$, the sample size per condition will need to be about $2 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)}}{\widetilde{\tau}} \right)^{2}$ (or $2 \cdot \left( \frac{2.5 \cdot \widetilde{SD(Y)} \cdot \sqrt{1 - \widetilde{R^{2}}}}{\widetilde{\tau}} \right)^{2}$ if including control variables), where $\widetilde{SD(Y)}$ is the standard deviation of the outcome in a reference population and $\widetilde{R^2}$ is the $R^2$ of a regression of the outcome on the control variables in a reference population.
+For 95\% power, the factor changes from 2.5 to 3.3.
+\end{rule0}
+
+{\noindent \footnotesize \textit{Note: Rule~\ref{rule:sd-to-sample-size} must be modified for interactions and for unbalanced or clustered assignment. See~\ref{app:designs}. For a two-sided test, the factors are 2.8 and 3.6. See Table~1.}}
+
+\begin{rule0}[80\% to 95\% Power]
+\label{rule:80-to-95}
+Increasing the sample size by about 75\% will increase the power from 80\% to about 95\%.
+\end{rule0}
+
+{\noindent \footnotesize\textit{Note: For a two-sided test, increasing the sample size by about 66\% will increase the power from 80\% to about 95\%.}}
+
+\printbibliography
+
+\end{document}

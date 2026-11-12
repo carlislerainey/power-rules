@@ -1,0 +1,536 @@
++ date
+Fri Oct 23 11:35:39 EDT 2026
++ Rscript -e 'source("R/01-clean-anes.R", echo = TRUE, keep.source = TRUE, max.deparse.length = Inf)'
+
+> # clean the 2020 ANES for the worked examples
+> 
+> # load packages
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+> # load data (ANES cumulative data file; from February 5, 2026)
+> anes_raw <- read_csv("data/anes_timeseries_cdf_csv_20260205.csv",
++                      col_select = c(VCF0004,   # year of study
++                                     VCF0218,   # feeling thermometer toward Democratic party
++                                     VCF0224,   # feeling thermometer toward Republican party
++                                     VCF0301,   # party identification, 7 categories
++                                     VCF0303,   # party identification, 3 categories, including leaners
++                                     VCF0305),  # strength of partisanship
++                      show_col_types = FALSE) %>%
++   glimpse()
+Rows: 73,745
+Columns: 6
+$ VCF0004 <dbl> 1948, 1948, 1948, 1948, 1948, 1948, 1948, 1948, 1948, 1948, 19…
+$ VCF0218 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ VCF0224 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ VCF0301 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ VCF0303 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ VCF0305 <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+
+> anes <- anes_raw %>%
++   # keep 2020 respondents
++   filter(VCF0004 == 2020) %>%
++   select(raw_ft_dem = VCF0218,
++          raw_ft_rep = VCF0224,
++          raw_pid = VCF0303,
++          pid7 = VCF0301,
++          pid_strength = VCF0305) %>%
++   # party id
++   mutate(pid3 = case_when(raw_pid == 1 ~ "Democrat",
++                           raw_pid == 2 ~ "Independent",
++                           raw_pid == 3 ~ "Republican")) %>%
++   # out-party ft (97 = 97-100 degrees; 98 = DK and 99 = NA are missing)
++   mutate(ft_outparty = case_when(pid3 == "Democrat" ~ raw_ft_rep,
++                                  pid3 == "Republican" ~ raw_ft_dem)) %>%
++   mutate(ft_outparty = case_when(ft_outparty > 97 ~ NA,
++                                  TRUE ~ ft_outparty)) %>%
++   # drop missing values and independents (independents have no out-party)
++   select(pid7, pid_strength, ft_outparty) %>%
++   na.omit() %>%
++   glimpse()
+Rows: 7,201
+Columns: 3
+$ pid7         <dbl> 7, 3, 6, 3, 6, 6, 2, 1, 2, 7, 2, 3, 5, 3, 1, 1, 2, 7, 1, …
+$ pid_strength <dbl> 4, 2, 3, 2, 3, 3, 3, 4, 3, 4, 3, 2, 2, 2, 4, 4, 3, 4, 4, …
+$ ft_outparty  <dbl> 0, 0, 50, 15, 15, 50, 50, 0, 30, 0, 0, 40, 0, 30, 16, 0, …
+
+> # write clean data
+> dir.create("output/data", recursive = TRUE, showWarnings = FALSE)
+
+> write_csv(anes, "output/data/anes-2020.csv")
++ Rscript -e 'source("R/02-clean-bkw.R", echo = TRUE, keep.source = TRUE, max.deparse.length = Inf)'
+
+> # clean Broockman, Kalla, and Westwood's (2023) replication of Ahler and Sood (2018)
+> 
+> # load packages
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+> library(haven)
+
+> # load data
+> svy5_raw <- read_dta("data/bkw-survey-5.dta") %>%
++   # keep respondents who finished Survey 5
++   filter(finished_survey == 1) %>%
++   glimpse()
+Rows: 2,504
+Columns: 35
+$ age                              <dbl> 74, 73, 70, 73, 67, 68, 80, 71, 69, 6…
+$ therm_outparty                   <dbl> 13, 19, 100, 72, 8, 0, 70, 35, 60, 15…
+$ therm_inparty                    <dbl> 96, 83, 100, 40, 93, 25, 63, 70, 60, …
+$ therm_outpartyelites             <dbl> 1, 0, 80, 73, 8, 0, 73, 25, 51, 3, 7,…
+$ therm_inpartyelites              <dbl> 100, 92, 89, 40, 93, 25, 54, 75, 51, …
+$ therm_young                      <dbl> 26, 92, 100, 73, 92, 1, 33, 75, 62, 5…
+$ therm_old                        <dbl> 95, 92, 100, 73, 94, 60, 89, 75, 63, …
+$ sd_comfortneighbor               <dbl+lbl> 1, 1, 1, 1, 2, 1, 1, 2, 1, 2, 2, …
+$ profile_attractive               <dbl+lbl> NA, NA,  1,  2, NA, NA,  3, NA,  …
+$ profile_worker                   <dbl+lbl>  1,  2, NA, NA,  1,  3, NA,  2, N…
+$ normswhenpossiblefieldinpartyicp <dbl+lbl> 7, 6, 7, 7, 7, 4, 6, 6, 6, 4, 6, …
+$ normsifafieldinpartyicgovernorof <dbl+lbl> 1, 1, 2, 2, 2, 7, 2, 6, 2, 4, 5, …
+$ normsfieldinpartyicelectedoffici <dbl+lbl> 1, 1, 1, 1, 2, 4, 1, 2, 2, 1, 1, …
+$ normsifajournalistaccusesafieldi <dbl+lbl> 7, 5, 5, 1, 2, 7, 4, 2, 2, 4, 1, …
+$ normsfieldinpartysshouldreduceth <dbl+lbl> 7, 1, 1, 1, 2, 4, 1, 2, 2, 1, 1, …
+$ normsmailinvotingshouldbebannedi <dbl+lbl> 7, 1, 1, 1, 2, 3, 1, 1, 1, 1, 1, …
+$ nv_electoverinp                  <dbl+lbl> 7, 1, 1, 1, 4, 7, 1, 2, 1, 1, 2, …
+$ justified_useviogoals            <dbl+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ justified_usevio2024             <dbl+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ justified_harassmass             <dbl+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ justified_thrtleadrs             <dbl+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ treatment                        <chr> "outparty_friend", "negative_trust_ga…
+$ race_white                       <dbl+lbl> 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ race_latinx                      <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+$ race_black                       <dbl+lbl> 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+$ race_asian_or_other              <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+$ finished_survey                  <dbl+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ pid7                             <dbl+lbl> 7, 1, 6, 6, 2, 6, 2, 1, 2, 3, 3, …
+$ female                           <dbl+lbl> 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, …
+$ income                           <dbl+lbl>  8,  5,  9,  5,  9,  1, NA,  1,  …
+$ education                        <dbl+lbl> 4, 3, 2, 5, 2, 5, 5, 5, 5, 6, 5, …
+$ ideology                         <dbl+lbl> 5, 3, 4, 3, 3, 4, 3, 2, 4, 1, 3, …
+$ manip_check_fair                 <dbl+lbl> NA,  1, NA, NA,  1, NA, NA, NA, N…
+$ norms_scale                      <dbl> 0.609912694, -1.194163084, -1.1940062…
+$ justified_scale                  <dbl> -0.4298401, -0.4298401, -0.4298401, -…
+
+> bkw <- svy5_raw %>%
++   # keep the control and the Ahler and Sood treatment
++   filter(treatment %in% c("control", "ahler_sood")) %>%
++   mutate(treatment = case_when(treatment == "control" ~ 0,
++                                treatment == "ahler_sood" ~ 1),
++          pid7 = as.numeric(pid7),
++          pid_strength = abs(pid7 - 4)) %>%
++   # outcome is the out-party ft (not the difference between the in- and out-party fts)
++   select(treatment, pid7, pid_strength, ft_outparty = therm_outparty) %>%
++   glimpse()
+Rows: 1,003
+Columns: 4
+$ treatment    <dbl> 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, …
+$ pid7         <dbl> 6, 1, 2, 6, 6, 7, 1, 7, 1, 1, 1, 6, 5, 6, 7, 3, 1, 7, 6, …
+$ pid_strength <dbl> 2, 3, 2, 2, 2, 3, 3, 3, 3, 3, 3, 2, 1, 2, 3, 1, 3, 3, 2, …
+$ ft_outparty  <dbl> 0, 35, 60, 54, 52, 14, 0, 20, 39, 35, 9, 20, 58, 40, 61, …
+
+> # write clean data
+> dir.create("output/data", recursive = TRUE, showWarnings = FALSE)
+
+> write_csv(bkw, "output/data/bkw-survey-5.csv")
++ Rscript -e 'source("R/03-clean-pilot.R", echo = TRUE, keep.source = TRUE, max.deparse.length = Inf)'
+
+> # clean the Cutler, Pietryka, and Rainey pilot study
+> 
+> # load packages
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+> # load data
+> pilot <- read_csv("data/cutler-pilot-extract.csv", show_col_types = FALSE) %>%
++   na.omit() %>%
++   glimpse()
+Rows: 224
+Columns: 3
+$ condition        <chr> "tell", "ask", "control", "tell", "ask", "ask", "cont…
+$ pre_ft_outparty  <dbl> 24, 39, 80, 4, 25, 0, 25, 0, 48, 10, 16, 30, 9, 60, 1…
+$ post_ft_outparty <dbl> 33, 44, 80, 2, 23, 0, 25, 0, 45, 10, 15, 30, 10, 61, …
+
+> # write clean data
+> dir.create("output/data", recursive = TRUE, showWarnings = FALSE)
+
+> write_csv(pilot, "output/data/cutler-pilot.csv")
++ Rscript -e 'source("R/04-compute-quantities.R", echo = TRUE, keep.source = TRUE, max.deparse.length = Inf)'
+
+> # compute the numbers in "Power Rules" that come from data
+> 
+> # load packages
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+> library(sandwich)
+
+> library(lmtest)
+Loading required package: zoo
+
+Attaching package: ‘zoo’
+
+The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
+
+> library(testthat)
+
+Attaching package: ‘testthat’
+
+The following objects are masked from ‘package:readr’:
+
+    edition_get, local_edition
+
+
+> # load clean data
+> anes  <- read_csv("output/data/anes-2020.csv")
+Rows: 7201 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+dbl (3): pid7, pid_strength, ft_outparty
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+> bkw   <- read_csv("output/data/bkw-survey-5.csv")
+Rows: 1003 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+dbl (4): treatment, pid7, pid_strength, ft_outparty
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+> pilot <- read_csv("output/data/cutler-pilot.csv")
+Rows: 224 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): condition
+dbl (2): pre_ft_outparty, post_ft_outparty
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+> # Example: Evaluating Power for a Fixed Sample Size -----------------------
+> 
+> # Broockman, Kalla, and Westwood's replication of Ahler and Sood
+> fit_bkw <- lm(ft_outparty ~ treatment, data = bkw)
+
+> # estimate
+> est_bkw <- coef(fit_bkw)[["treatment"]]
+
+> est_bkw
+[1] 3.873333
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(est_bkw, 1),
++   3.9  # reported in paper
++   )
+
+> # 90% CI
+> ci_bkw <- coefci(fit_bkw, "treatment", level = 0.90, vcov. = vcovHC(fit_bkw, type = "HC2"), df = Inf)
+
+> ci_bkw
+               5 %     95 %
+treatment 1.119174 6.627492
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   unname(round(ci_bkw[1, ], 1)),
++   c(1.1, 6.6)  # reported in paper
++   )
+
+> ## Without Control Variables: Rules 3 and 5 -------------------------------
+> 
+> # SD of the out-party ft in the 2020 ANES (unweighted)
+> sd_anes <- sd(anes$ft_outparty)
+
+> sd_anes
+[1] 20.77251
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(sd_anes, 1),
++   20.8  # reported in paper
++   )
+
+> ## With Control Variables: Rules 3, 4, and 5 ------------------------------
+> 
+> # R^2 of party id and partisan strength in the 2020 ANES (%)
+> r_sq_anes <- summary(lm(ft_outparty ~ pid7 + pid_strength, data = anes))$r.squared
+
+> r_sq_anes
+[1] 0.0542818
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(100*r_sq_anes),
++   5  # reported in paper
++   )
+
+> # footnote 27: R^2 in Broockman, Kalla, and Westwood's control group (%)
+> r_sq_bkw_control <- summary(lm(ft_outparty ~ pid7 + pid_strength, data = filter(bkw, treatment == 0)))$r.squared
+
+> r_sq_bkw_control
+[1] 0.009582398
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(100*r_sq_bkw_control, 1),
++   1.0  # reported in paper
++   )
+
+> # footnote 27: R^2 in Broockman, Kalla, and Westwood's treatment group (%)
+> r_sq_bkw_treatment <- summary(lm(ft_outparty ~ pid7 + pid_strength, data = filter(bkw, treatment == 1)))$r.squared
+
+> r_sq_bkw_treatment
+[1] 0.0179562
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(100*r_sq_bkw_treatment, 1),
++   1.8  # reported in paper
++   )
+
+> # footnote 27: average R^2 of the two groups (%)
+> r_sq_bkw <- mean(c(r_sq_bkw_control, r_sq_bkw_treatment))
+
+> r_sq_bkw
+[1] 0.0137693
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(100*r_sq_bkw, 1),
++   1.4  # reported in paper
++   )
+
+> # footnote 27: reduction in the SE from the average R^2 (%)
+> se_reduction_bkw <- 1 - sqrt(1 - r_sq_bkw)
+
+> se_reduction_bkw
+[1] 0.006908513
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(100*se_reduction_bkw, 1),
++   0.7  # reported in paper
++   )
+
+> # footnote 28: R^2 of the pre-treatment measure within condition in the pilot (%)
+> fit_pilot_pre  <- lm(post_ft_outparty ~ condition + pre_ft_outparty, data = pilot)
+
+> fit_pilot_cond <- lm(post_ft_outparty ~ condition, data = pilot)
+
+> r_sq_pilot <- 1 - sum(resid(fit_pilot_pre)^2)/sum(resid(fit_pilot_cond)^2)
+
+> r_sq_pilot
+[1] 0.7603463
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(100*r_sq_pilot),
++   76  # reported in paper
++   )
+
+> # footnote 28: reduction in the SE from the pilot R^2 (%)
+> se_reduction_pilot <- 1 - sqrt(1 - r_sq_pilot)
+
+> se_reduction_pilot
+[1] 0.5104556
+
+> # test that code reproduces value reported in the paper
+> expect_equal(
++   round(100*se_reduction_pilot),
++   51  # reported in paper
++   )
+
+> # software versions -------------------------------------------------------
+> 
+> sessionInfo()
+R version 4.6.1 (2026-06-24)
+Platform: aarch64-apple-darwin23
+Running under: macOS Tahoe 26.7.1
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] C.UTF-8/C.UTF-8/C.UTF-8/C/C.UTF-8/C.UTF-8
+
+time zone: America/New_York
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] testthat_3.3.2  lmtest_0.9-40   zoo_1.9-1       sandwich_3.1-3 
+ [5] lubridate_1.9.5 forcats_1.0.1   stringr_1.6.0   dplyr_1.2.1    
+ [9] purrr_1.2.2     readr_2.2.0     tidyr_1.3.2     tibble_3.3.1   
+[13] ggplot2_4.0.3   tidyverse_2.0.0
+
+loaded via a namespace (and not attached):
+ [1] bit_4.6.0          gtable_0.3.6       crayon_1.5.3       compiler_4.6.1    
+ [5] brio_1.1.5         tidyselect_1.2.1   parallel_4.6.1     scales_1.4.0      
+ [9] lattice_0.23-1     R6_2.6.1           generics_0.1.4     desc_1.4.3        
+[13] rprojroot_2.1.1    pillar_1.11.1      RColorBrewer_1.1-3 tzdb_0.5.0        
+[17] rlang_1.3.0        stringi_1.8.9      S7_0.2.2           pkgload_1.5.3     
+[21] bit64_4.8.4        otel_0.2.0         timechange_0.4.0   cli_3.6.6         
+[25] withr_3.0.3        magrittr_2.0.5     grid_4.6.1         vroom_1.7.1       
+[29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.7.3        glue_1.8.1        
+[33] farver_2.1.2       tools_4.6.1        pkgconfig_2.0.3   
++ Rscript -e 'source("R/05-make-figure-1.R", echo = TRUE, keep.source = TRUE, max.deparse.length = Inf)'
+
+> # make the base plot for Figure 1 ("The Geometry of 80% Power")
+> 
+> # load packages
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+> # create folder for figures
+> dir.create("output/fig", recursive = TRUE, showWarnings = FALSE)
+
+> # study parameters
+> true_effect <- 5
+
+> se_fig <- true_effect/2.5
+
+> # plot
+> gg <- ggplot() +
++   annotate("segment", x = 1.64*se_fig, xend = 1.64*se_fig,
++            y = 0, yend = dnorm(1.64*se_fig, mean = true_effect, sd = se_fig),
++            linewidth = 0.5, color = "#d95f02") +
++   geom_vline(xintercept = 0, linewidth = 0.5, color = "grey50") +
++   geom_function(fun = dnorm, args = list(mean = true_effect, sd = se_fig),
++                 linewidth = 0.5, n = 1001, color = "grey50") +
++   geom_area(data = tibble(x = seq(1.64*se_fig, 3*se_fig + true_effect, by = 0.1)),  # stat = "function" ignores these values, but the layer needs non-empty data
++             stat = "function", fun = dnorm, args = list(mean = true_effect, sd = se_fig),
++             fill = "#d95f02", alpha = 0.1, xlim = c(1.64*se_fig, 3*se_fig + true_effect)) +
++   theme_bw(base_family = "Verdana") +  # the journal's preferred font for figures
++   theme(panel.grid = element_blank()) +
++   labs(x = "Treatment Effect\n(in original units)",
++        y = "Density") +
++   scale_x_continuous(breaks = c(0, 1, 3, 5, 7, 9, 11),
++                      limits = c(true_effect - 3*se_fig, true_effect + 3*se_fig))
+
+> # save figure
+> #   - cairo_pdf embeds the font (Verdana must be installed; otherwise cairo substitutes another font)
+> ggsave("output/fig/figure-1-base.pdf", gg, height = 4, width = 6, scale = 1.2, device = cairo_pdf)
+
+> # note: I added the annotations manually using keynote
++ Rscript -e 'source("R/06-simulate-rule-1.R", echo = TRUE, keep.source = TRUE, max.deparse.length = Inf)'
+
+> # run simulation for footnote 12
+> 
+> # load packages
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+> library(testthat)
+
+Attaching package: ‘testthat’
+
+The following objects are masked from ‘package:readr’:
+
+    edition_get, local_edition
+
+
+> # set seed
+> set.seed(1234)
+
+> # design
+> n   <- 50             # respondents per condition
+
+> se  <- 2*1/sqrt(2*n)  # true SE with SD = 1 (Rule 3)
+
+> tau <- 2.5*se         # treatment effect, so that tau/SE = 2.5
+
+> # simulate experiments in chunks; each row of y0 and y1 is one experiment
+> simulate_experiments <- function(n_exp) {
++   y0 <- matrix(rnorm(n_exp*n, mean = 0,   sd = 1), nrow = n_exp)
++   y1 <- matrix(rnorm(n_exp*n, mean = tau, sd = 1), nrow = n_exp)
++   row_var <- function(y) rowSums((y - rowMeans(y))^2)/(n - 1)
++   se_hat  <- sqrt(row_var(y1)/n + row_var(y0)/n)  # HC2 (Neyman) SE
++   rowMeans(y1) - rowMeans(y0) - 1.64*se_hat > 0
++ }
+
+> reject <- map(rep(10000, 100), simulate_experiments) %>% unlist()  # 1,000,000 experiments
+
+> # power from Rules 1 and 2 (the two forms are equal) and simulated power
+> power_rule_1    <- 1 - pnorm(1.64 - tau/se)
+
+> power_simulated <- mean(reject)
+
+> c(power_rule_1, power_simulated)
+[1] 0.8051055 0.8046190
+
+> # error in power (percentage points; paper: less than 1)
+> error_pct_points <- 100*abs(power_simulated - power_rule_1)
+
+> error_pct_points
+[1] 0.04864787
+
+> # test that code reproduces value reported in the paper
+> expect_lt(
++   error_pct_points,
++   1  # reported in paper (less than 1 percentage point)
++   )
++ date
+Fri Oct 23 11:35:47 EDT 2026
