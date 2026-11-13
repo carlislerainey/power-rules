@@ -6,4 +6,5 @@
 - [Appendix (PDF)](power-rules-appendix.pdf)
 - [Preprint on OSF](https://osf.io/preprints/osf/5am9q)
 - [HTML version](https://www.carlislerainey.com/papers/power-rules/)
+- [Markdown version (for AI agents)](https://www.carlislerainey.com/power-rules/md-version/power-rules.md)
 - [Replication data and code on Dataverse](https://doi.org/10.7910/DVN/EMLFBT)
