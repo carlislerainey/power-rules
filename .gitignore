@@ -1,6 +1,6 @@
 # local only (not on GitHub)
 -old/
-html-version/
+html-version/build/
 replication-archive-helpers/
 
 # 163 MB, over GitHub's 100 MB limit for a file; it is in the copy of the replication
@@ -9,19 +9,23 @@ replication-archive/data/anes_timeseries_cdf_csv_20260205.csv
 
 # generated
 __pycache__/
+# the paper's two parts, built apart before they are joined (latex-version/Makefile)
+latex-version/build/
 
-# LaTeX's intermediate files, in this folder only (replication-archive/run.log is part
-# of the archive)
-/*.aux
-/*.bbl
-/*.bcf
-/*.blg
-/*.fdb_latexmk
-/*.fls
-/*.log
-/*.out
-/*.run.xml
-/*.synctex.gz
+# what LaTeX leaves in latex-version/ when the paper is compiled there by hand or by an
+# editor: its intermediate files and a PDF of one part (the paper's PDF is ./power-rules.pdf)
+/latex-version/*.aux
+/latex-version/*.bbl
+/latex-version/*.bcf
+/latex-version/*.blg
+/latex-version/*.fdb_latexmk
+/latex-version/*.fls
+/latex-version/*.log
+/latex-version/*.out
+/latex-version/*.run.xml
+/latex-version/*.synctex.gz
+/latex-version/power-rules.pdf
+/latex-version/power-rules-appendix.pdf
 
 # the operating system and editors
 .DS_Store

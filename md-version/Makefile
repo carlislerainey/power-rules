@@ -3,7 +3,7 @@
 #   make check    compares power-rules.md with the paper
 #   make clean    removes power-rules.md
 # power-rules.md is guide.md (written by hand) followed by the paper's text, which comes
-# from ../power-rules.tex and ../power-rules-appendix.tex through ../html-version's LaTeX
+# from ../latex-version/power-rules.tex and power-rules-appendix.tex through ../html-version's LaTeX
 # to Markdown step (its build/md/). Edit guide.md or the LaTeX source, never power-rules.md.
 
 HTML = ../html-version
@@ -12,7 +12,7 @@ MD   = $(HTML)/build/md
 all: power-rules.md check
 
 # the paper as Markdown, made in ../html-version (its Makefile knows how)
-$(MD)/body.md: ../power-rules.tex ../power-rules-appendix.tex ../bibliography.bib
+$(MD)/body.md: ../latex-version/power-rules.tex ../latex-version/power-rules-appendix.tex ../latex-version/bibliography.bib
 	$(MAKE) -C $(HTML) build/md/body.md
 
 power-rules.md: guide.md agents.lua build.py $(MD)/body.md

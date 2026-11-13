@@ -5,8 +5,7 @@
 **The paper**
 
 - [Paper (PDF)](power-rules.pdf)
-- [Appendix (PDF)](power-rules-appendix.pdf)
-- [HTML version](https://www.carlislerainey.com/papers/power-rules/)
+- [HTML version](https://www.carlislerainey.com/power-rules/html-version/)
 - [Markdown version (for AI agents)](https://www.carlislerainey.com/power-rules/md-version/power-rules.md)
 - [Preprint on OSF](https://osf.io/preprints/osf/5am9q)
 

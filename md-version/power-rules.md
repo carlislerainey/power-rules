@@ -7,7 +7,7 @@ Carlisle Rainey. Accepted at *Political Analysis*.
 - `status`: accepted, forthcoming (no article DOI yet)
 - `text`: the accepted manuscript, word for word (main text, Appendices 1-4, references)
 - `format`: Markdown for AI agents; math is LaTeX between dollar signs
-- `html_version`: https://www.carlislerainey.com/papers/power-rules/
+- `html_version`: https://www.carlislerainey.com/power-rules/html-version/
 - `preprint`: https://osf.io/preprints/osf/5am9q
 - `replication_archive`: https://doi.org/10.7910/DVN/EMLFBT
 - `web_app`: https://www.carlislerainey.com/power-rules/app/

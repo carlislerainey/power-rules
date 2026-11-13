@@ -23,7 +23,7 @@ Never edit `power-rules.md`. Edit `guide.md` or the paper's LaTeX source, then `
 
 ## How the file is made
 
-The paper's text comes from `../power-rules.tex` and `../power-rules-appendix.tex` through the LaTeX-to-Markdown step of `../html-version/` (its `build/md/abstract.md` and `body.md`; `make` here asks that folder's Makefile for them, so `html-version/` and its requirements must be present; that folder is not in the GitHub repository, so `make` works only where it is). `agents.lua` then changes the markup only, and `build.py` makes three more changes that an agent's text search needs: non-breaking spaces become spaces, curly quotation marks become straight, and the tables lose their padding (square brackets also lose pandoc's backslashes). Last, it writes the index of sections by line number into the guide, at the line `<!-- index -->`.
+The paper's text comes from `../latex-version/power-rules.tex` and `power-rules-appendix.tex` there, through the LaTeX-to-Markdown step of `../html-version/` (its `build/md/abstract.md` and `body.md`; `make` here asks that folder's Makefile for them, so `html-version/` and its requirements must be present). `agents.lua` then changes the markup only, and `build.py` makes three more changes that an agent's text search needs: non-breaking spaces become spaces, curly quotation marks become straight, and the tables lose their padding (square brackets also lose pandoc's backslashes). Last, it writes the index of sections by line number into the guide, at the line `<!-- index -->`.
 
 ## How it is written for agents
 

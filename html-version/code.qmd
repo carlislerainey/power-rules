@@ -1,0 +1,1003 @@
+<!--
+Code for the HTML version. assemble.py places each chunk after the paragraph of the paper
+that contains the text on its "after:" line (the text must be in exactly one paragraph of
+build/md/body.md). Each chunk is a collapsed callout, so the paper reads the same as the
+PDFs until a reader opens it.
+
+The displayed code reads the cleaned data from the replication archive on Dataverse, by file ID
+(eval: false), and glimpse()s it; a hidden chunk reads the same files from data/ (copied from
+replication-archive/output/data/, identical to the Dataverse copies) to render the page offline.
+
+A "Check by simulation" callout follows the R code for each power calculation that the paper
+makes with the rules. Its two tabs (a Quarto tabset in the group "simulation", so that choosing a
+tab chooses it in every box) simulate the design in base R and in DeclareDesign, after
+Declaration 18.1 of Blair, Coppock, and Humphreys (2023), and report the average standard error
+and the share of rejections, for comparison with the rules' SE and power. Each box stands alone:
+it loads its packages and sets its inputs. The chunks are cached and labeled (5,000 experiments each; from half a minute to a few minutes each),
+so that an edit elsewhere in this file does not rerun them.
+-->
+
+<!-- after: or the `pnorm()` function in R -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# power for a treatment effect of 5 and a standard error of 2 (the case in Figure 1)
+tau <- 5
+se  <- 2
+
+# Rule 1: the normal CDF with mean tau and standard deviation SE
+1 - pnorm(1.64*se, mean = tau, sd = se)
+
+# Rule 2: the standard normal CDF (the same number)
+1 - pnorm(1.64 - tau/se)
+```
+:::
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Check by simulation
+
+::: {.panel-tabset group="simulation"}
+### Base R
+
+```{r}
+#| label: sim-figure-1-base-r
+#| message: false
+#| cache: true
+# simulate the case in Figure 1: a treatment effect of 5 and a standard error of 2; any design
+#   with that standard error will do, here 50 respondents per condition and outcomes with an SD
+#   of 10 within each condition (Rule 3); analyze each experiment as in the paper (OLS with HC2
+#   standard errors; reject if the lower bound of the 90% confidence interval is above zero)
+
+library(sandwich)  # robust standard errors
+library(lmtest)    # confidence intervals with robust standard errors
+
+set.seed(1234)
+n    <- 50
+sd_y <- 10
+tau  <- 5
+
+simulate_experiment <- function() {
+  y0  <- rnorm(2*n, mean = 0, sd = sd_y)   # potential outcomes under control...
+  y1  <- y0 + tau                          # ...and under treatment
+  z   <- sample(rep(0:1, each = n))        # n respondents to each condition, at random
+  y   <- ifelse(z == 1, y1, y0)
+  fit <- lm(y ~ z)
+  v   <- vcovHC(fit, type = "HC2")
+  ci  <- coefci(fit, "z", level = 0.90, vcov. = v, df = Inf)
+  c(se = sqrt(v["z", "z"]), reject = ci[1] > 0)
+}
+sims <- replicate(5000, simulate_experiment())
+
+# the average standard error (2) and the share of rejections (Rules 1 and 2: 80%)
+rowMeans(sims)
+```
+
+### DeclareDesign
+
+The design follows [Declaration 18.1](https://book.declaredesign.org/library/experimental-causal.html) in Blair, Coppock, and Humphreys ([2023](#ref-Blair2023)).
+
+```{r}
+#| label: sim-figure-1-declaredesign
+#| message: false
+#| cache: true
+# the case in Figure 1 as a design: a treatment effect of 5 and a standard error of 2 (50
+#   respondents per condition and outcomes with an SD of 10 within each condition; Rule 3);
+#   analyze each experiment as in the paper (the difference in means, with HC2 standard errors;
+#   reject if the lower bound of the 90% confidence interval is above zero)
+
+library(DeclareDesign)
+
+n    <- 50
+sd_y <- 10
+tau  <- 5
+
+figure_1 <-
+  declare_model(N = 2 * n,
+                U = rnorm(N, sd = sd_y),
+                potential_outcomes(Y ~ tau * Z + U)) +
+  declare_inquiry(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(Z = complete_ra(N, prob = 0.5)) +
+  declare_measurement(Y = reveal_outcomes(Y ~ Z)) +
+  declare_estimator(Y ~ Z, inquiry = "ATE", alpha = 0.10)
+
+# the average standard error (2) and the share of rejections (Rules 1 and 2: 80%)
+set.seed(1234)
+diagnose_design(figure_1, sims = 5000, bootstrap_sims = FALSE,
+                diagnosands = declare_diagnosands(
+                  se = mean(std.error),
+                  power = mean(conf.low > 0)))
+```
+:::
+:::
+
+<!-- after: collects these four factors for quick reference -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# minimum detectable effect, in standard errors
+qnorm(0.95) + qnorm(0.80)   # one-sided test, 80% power (2.5)
+qnorm(0.95) + qnorm(0.95)   # one-sided test, 95% power (3.3)
+qnorm(0.975) + qnorm(0.80)  # two-sided test, 80% power (2.8)
+qnorm(0.975) + qnorm(0.95)  # two-sided test, 95% power (3.6)
+
+# footnote 22: the inverse of the standard normal CDF at 0.80
+qnorm(0.80)
+
+# error from rounding 2.48 to 2.5 and 3.29 to 3.3 (%): MDE and sample size
+mde_80 <- qnorm(0.95) + qnorm(0.80)
+mde_95 <- qnorm(0.95) + qnorm(0.95)
+100*abs(c(2.5/mde_80, 3.3/mde_95) - 1)
+100*abs(c(2.5/mde_80, 3.3/mde_95)^2 - 1)
+```
+:::
+
+<!-- after: gives an estimated treatment effect of 3.9 with a 90% confidence interval -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+#| message: false
+library(tidyverse)
+library(sandwich)  # robust standard errors
+library(lmtest)    # confidence intervals with robust standard errors
+```
+
+```{r}
+#| eval: false
+# Broockman, Kalla, and Westwood's replication of Ahler and Sood (control and treatment
+#   groups, with the feeling thermometer toward the out-party as the outcome), from the paper's
+#   replication archive on Dataverse (doi:10.7910/DVN/EMLFBT)
+bkw <- read_csv("https://dataverse.harvard.edu/api/access/datafile/14366478")
+```
+
+```{r}
+#| include: false
+bkw <- read_csv("data/bkw-survey-5.csv", show_col_types = FALSE)
+```
+
+```{r}
+glimpse(bkw)
+```
+
+```{r}
+# estimate and 90% confidence interval (HC2 robust standard errors)
+fit <- lm(ft_outparty ~ treatment, data = bkw)
+coefci(fit, "treatment", level = 0.90, vcov. = vcovHC(fit, type = "HC2"), df = Inf)
+coef(fit)["treatment"]
+```
+:::
+
+<!-- after: The standard deviation of the responses to the similar ANES question is 20.8 -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+#| eval: false
+# 2020 ANES partisans, with the feeling thermometer toward the out-party, from the paper's
+#   replication archive on Dataverse (doi:10.7910/DVN/EMLFBT)
+anes <- read_csv("https://dataverse.harvard.edu/api/access/datafile/14366477")
+```
+
+```{r}
+#| include: false
+anes <- read_csv("data/anes-2020.csv", show_col_types = FALSE)
+```
+
+```{r}
+glimpse(anes)
+```
+
+```{r}
+# standard deviation of the out-party thermometer (unweighted)
+sd(anes$ft_outparty)
+```
+:::
+
+<!-- after: giving 3.70 and 4.75 points -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Rule 3: the standard error with 500 respondents per condition
+sd_y <- 20.8
+n    <- 500
+se   <- 2*sd_y/sqrt(2*n)
+se
+
+# Rule 5: minimum detectable effects with 80% and 95% power
+2.5*1.32  # one-sided test
+3.3*1.32
+2.8*1.32  # two-sided test
+3.6*1.32
+```
+:::
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Check by simulation
+
+::: {.panel-tabset group="simulation"}
+### Base R
+
+```{r}
+#| label: sim-ahler-sood-base-r
+#| message: false
+#| cache: true
+# simulate the replication: 500 respondents per condition, outcomes with an SD of 20.8 within
+#   each condition, and a treatment effect of 3.30 (the 80% MDE from Rule 5); analyze each
+#   experiment as in the paper (OLS with HC2 standard errors; reject if the lower bound of the
+#   90% confidence interval is above zero)
+
+library(sandwich)  # robust standard errors
+library(lmtest)    # confidence intervals with robust standard errors
+
+set.seed(1234)
+n    <- 500
+sd_y <- 20.8
+tau  <- 3.30  # smallest substantively meaningful effect
+
+simulate_experiment <- function() {
+  y0  <- rnorm(2*n, mean = 0, sd = sd_y)   # potential outcomes under control...
+  y1  <- y0 + tau                          # ...and under treatment
+  z   <- sample(rep(0:1, each = n))        # n respondents to each condition, at random
+  y   <- ifelse(z == 1, y1, y0)
+  fit <- lm(y ~ z)
+  v   <- vcovHC(fit, type = "HC2")
+  ci  <- coefci(fit, "z", level = 0.90, vcov. = v, df = Inf)
+  c(se = sqrt(v["z", "z"]), reject = ci[1] > 0)
+}
+sims <- replicate(5000, simulate_experiment())
+
+# the average standard error (Rule 3: 1.32) and the share of rejections (Rule 5: 80%)
+rowMeans(sims)
+```
+
+### DeclareDesign
+
+The design follows [Declaration 18.1](https://book.declaredesign.org/library/experimental-causal.html) in Blair, Coppock, and Humphreys ([2023](#ref-Blair2023)).
+
+```{r}
+#| label: sim-ahler-sood-declaredesign
+#| message: false
+#| cache: true
+# the replication as a design: 500 respondents per condition, outcomes with an SD of 20.8
+#   within each condition, and a treatment effect of 3.30 (the 80% MDE from Rule 5); analyze
+#   each experiment as in the paper (the difference in means, with HC2 standard errors; reject if
+#   the lower bound of the 90% confidence interval is above zero)
+
+library(DeclareDesign)
+
+n    <- 500
+sd_y <- 20.8
+tau  <- 3.30  # smallest substantively meaningful effect
+
+replication <-
+  declare_model(N = 2 * n,
+                U = rnorm(N, sd = sd_y),
+                potential_outcomes(Y ~ tau * Z + U)) +
+  declare_inquiry(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(Z = complete_ra(N, prob = 0.5)) +
+  declare_measurement(Y = reveal_outcomes(Y ~ Z)) +
+  declare_estimator(Y ~ Z, inquiry = "ATE", alpha = 0.10)
+
+# the average standard error (Rule 3: 1.32) and the share of rejections (Rule 5: 80%)
+set.seed(1234)
+diagnose_design(replication, sims = 5000, bootstrap_sims = FALSE,
+                diagnosands = declare_diagnosands(
+                  se = mean(std.error),
+                  power = mean(conf.low > 0)))
+```
+:::
+:::
+
+<!-- after: but will not change the standard error dramatically -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# R^2 of party identification and partisan strength in the 2020 ANES
+r_sq <- summary(lm(ft_outparty ~ pid7 + pid_strength, data = anes))$r.squared
+r_sq
+
+# Rule 4: the reduction in the standard error for an R^2 of 5%
+1 - sqrt(1 - 0.05)
+
+# footnote 26: the same R^2 in Broockman, Kalla, and Westwood's control and treatment groups
+r_sq_control   <- summary(lm(ft_outparty ~ pid7 + pid_strength, data = filter(bkw, treatment == 0)))$r.squared
+r_sq_treatment <- summary(lm(ft_outparty ~ pid7 + pid_strength, data = filter(bkw, treatment == 1)))$r.squared
+c(r_sq_control, r_sq_treatment)
+
+# footnote 26: their average, and the reduction in the standard error
+r_sq_bkw <- mean(c(r_sq_control, r_sq_treatment))
+r_sq_bkw
+1 - sqrt(1 - r_sq_bkw)
+```
+:::
+
+<!-- after: are practically the same as those without any adjustment -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Rules 3 and 4: the standard error with an R^2 of 5%
+se_adj <- 2*20.8*sqrt(1 - 0.05)/sqrt(2*500)
+se_adj
+
+# Rule 5: minimum detectable effects with 80% and 95% power
+2.5*1.28
+3.3*1.28
+```
+:::
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Check by simulation
+
+::: {.panel-tabset group="simulation"}
+### Base R
+
+```{r}
+#| label: sim-adjusted-5-base-r
+#| message: false
+#| cache: true
+# simulate the replication with Broockman, Kalla, and Westwood's adjustment: 500 respondents per
+#   condition, outcomes with an SD of 20.8 within each condition, a control variable with an R^2
+#   of 5%, and a treatment effect of 3.20 (the 80% MDE from Rule 5); analyze each experiment as
+#   in the paper (OLS with the control variable and HC2 standard errors; reject if the lower
+#   bound of the 90% confidence interval is above zero)
+
+library(sandwich)  # robust standard errors
+library(lmtest)    # confidence intervals with robust standard errors
+
+set.seed(1234)
+n    <- 500
+sd_y <- 20.8
+r_sq <- 0.05
+tau  <- 3.20  # smallest substantively meaningful effect
+
+simulate_experiment <- function() {
+  x   <- rnorm(2*n)                                # the control variable
+  u   <- rnorm(2*n)
+  y0  <- sd_y*(sqrt(r_sq)*x + sqrt(1 - r_sq)*u)    # potential outcomes under control (x explains
+  y1  <- y0 + tau                                  #   a share r_sq of the variance)...and under treatment
+  z   <- sample(rep(0:1, each = n))                # n respondents to each condition, at random
+  y   <- ifelse(z == 1, y1, y0)
+  fit <- lm(y ~ z + x)
+  v   <- vcovHC(fit, type = "HC2")
+  ci  <- coefci(fit, "z", level = 0.90, vcov. = v, df = Inf)
+  c(se = sqrt(v["z", "z"]), reject = ci[1] > 0)
+}
+sims <- replicate(5000, simulate_experiment())
+
+# the average standard error (Rules 3 and 4: 1.28) and the share of rejections (Rule 5: 80%)
+rowMeans(sims)
+```
+
+### DeclareDesign
+
+The design follows [Declaration 18.1](https://book.declaredesign.org/library/experimental-causal.html) in Blair, Coppock, and Humphreys ([2023](#ref-Blair2023)), with a control variable.
+
+```{r}
+#| label: sim-adjusted-5-declaredesign
+#| message: false
+#| cache: true
+# the replication with Broockman, Kalla, and Westwood's adjustment as a design: 500 respondents
+#   per condition, outcomes with an SD of 20.8 within each condition, a control variable with an
+#   R^2 of 5%, and a treatment effect of 3.20 (the 80% MDE from Rule 5); analyze each experiment
+#   as in the paper (OLS with the control variable and HC2 standard errors; reject if the lower
+#   bound of the 90% confidence interval is above zero)
+
+library(DeclareDesign)
+
+n    <- 500
+sd_y <- 20.8
+r_sq <- 0.05
+tau  <- 3.20  # smallest substantively meaningful effect
+
+replication_adj <-
+  declare_model(N = 2 * n,
+                X = rnorm(N),  # the control variable, which explains a share r_sq of the variance
+                U = rnorm(N),
+                potential_outcomes(Y ~ tau * Z + sd_y * (sqrt(r_sq) * X + sqrt(1 - r_sq) * U))) +
+  declare_inquiry(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(Z = complete_ra(N, prob = 0.5)) +
+  declare_measurement(Y = reveal_outcomes(Y ~ Z)) +
+  declare_estimator(Y ~ Z + X, .method = lm_robust, se_type = "HC2", term = "Z",
+                    inquiry = "ATE", alpha = 0.10)
+
+# the average standard error (Rules 3 and 4: 1.28) and the share of rejections (Rule 5: 80%)
+set.seed(1234)
+diagnose_design(replication_adj, sims = 5000, bootstrap_sims = FALSE,
+                diagnosands = declare_diagnosands(
+                  se = mean(std.error),
+                  power = mean(conf.low > 0)))
+```
+:::
+:::
+
+<!-- after: might make a difference in whether we consider our 1,000-respondent study -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Clifford, Sheagley, and Piston's correlations between the pre- and post-treatment
+#   measures (0.61 to 0.90), as R^2
+c(0.61, 0.90)^2
+
+# Rules 3 and 4: the standard error with an R^2 of 40%
+se_pre <- 2*20.8*sqrt(1 - 0.40)/sqrt(2*500)
+se_pre
+
+# Rule 5: minimum detectable effects with 80% and 95% power
+2.5*1.02
+3.3*1.02
+```
+
+```{r}
+#| eval: false
+# footnote 27: Cutler, Pietryka, and Rainey's pilot study (feeling thermometer toward the
+#   out-party before and after the treatment), from the paper's replication archive on
+#   Dataverse (doi:10.7910/DVN/EMLFBT)
+pilot <- read_csv("https://dataverse.harvard.edu/api/access/datafile/14366479")
+```
+
+```{r}
+#| include: false
+pilot <- read_csv("data/cutler-pilot.csv", show_col_types = FALSE)
+```
+
+```{r}
+glimpse(pilot)
+```
+
+```{r}
+# footnote 27: R^2 of the pre-treatment measure within each condition (Rule 4 uses the R^2
+#   within condition, so both regressions include indicators for the condition)
+fit_pre  <- lm(post_ft_outparty ~ condition + pre_ft_outparty, data = pilot)
+fit_cond <- lm(post_ft_outparty ~ condition, data = pilot)
+r_sq_pilot <- 1 - sum(resid(fit_pre)^2)/sum(resid(fit_cond)^2)
+r_sq_pilot
+
+# footnote 27: the reduction in the standard error
+1 - sqrt(1 - r_sq_pilot)
+```
+:::
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Check by simulation
+
+::: {.panel-tabset group="simulation"}
+### Base R
+
+```{r}
+#| label: sim-pretreatment-40-base-r
+#| message: false
+#| cache: true
+# simulate the replication with a pre-treatment measure of the outcome as the control variable:
+#   500 respondents per condition, outcomes with an SD of 20.8 within each condition, a control
+#   variable with an R^2 of 40%, and a treatment effect of 2.55 (the 80% MDE from Rule 5); analyze
+#   each experiment as in the paper (OLS with the control variable and HC2 standard errors; reject
+#   if the lower bound of the 90% confidence interval is above zero)
+
+library(sandwich)  # robust standard errors
+library(lmtest)    # confidence intervals with robust standard errors
+
+set.seed(1234)
+n    <- 500
+sd_y <- 20.8
+r_sq <- 0.40
+tau  <- 2.55  # smallest substantively meaningful effect
+
+simulate_experiment <- function() {
+  x   <- rnorm(2*n)                                # the control variable
+  u   <- rnorm(2*n)
+  y0  <- sd_y*(sqrt(r_sq)*x + sqrt(1 - r_sq)*u)    # potential outcomes under control (x explains
+  y1  <- y0 + tau                                  #   a share r_sq of the variance)...and under treatment
+  z   <- sample(rep(0:1, each = n))                # n respondents to each condition, at random
+  y   <- ifelse(z == 1, y1, y0)
+  fit <- lm(y ~ z + x)
+  v   <- vcovHC(fit, type = "HC2")
+  ci  <- coefci(fit, "z", level = 0.90, vcov. = v, df = Inf)
+  c(se = sqrt(v["z", "z"]), reject = ci[1] > 0)
+}
+sims <- replicate(5000, simulate_experiment())
+
+# the average standard error (Rules 3 and 4: 1.02) and the share of rejections (Rule 5: 80%)
+rowMeans(sims)
+```
+
+### DeclareDesign
+
+The design follows [Declaration 18.1](https://book.declaredesign.org/library/experimental-causal.html) in Blair, Coppock, and Humphreys ([2023](#ref-Blair2023)), with a control variable.
+
+```{r}
+#| label: sim-pretreatment-40-declaredesign
+#| message: false
+#| cache: true
+# the replication with a pre-treatment measure of the outcome as the control variable, as a
+#   design: 500 respondents per condition, outcomes with an SD of 20.8 within each condition, a
+#   control variable with an R^2 of 40%, and a treatment effect of 2.55 (the 80% MDE from Rule 5);
+#   analyze each experiment as in the paper (OLS with the control variable and HC2 standard
+#   errors; reject if the lower bound of the 90% confidence interval is above zero)
+
+library(DeclareDesign)
+
+n    <- 500
+sd_y <- 20.8
+r_sq <- 0.40
+tau  <- 2.55  # smallest substantively meaningful effect
+
+replication_pre <-
+  declare_model(N = 2 * n,
+                X = rnorm(N),  # the control variable, which explains a share r_sq of the variance
+                U = rnorm(N),
+                potential_outcomes(Y ~ tau * Z + sd_y * (sqrt(r_sq) * X + sqrt(1 - r_sq) * U))) +
+  declare_inquiry(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(Z = complete_ra(N, prob = 0.5)) +
+  declare_measurement(Y = reveal_outcomes(Y ~ Z)) +
+  declare_estimator(Y ~ Z + X, .method = lm_robust, se_type = "HC2", term = "Z",
+                    inquiry = "ATE", alpha = 0.10)
+
+# the average standard error (Rules 3 and 4: 1.02) and the share of rejections (Rule 5: 80%)
+set.seed(1234)
+diagnose_design(replication_pre, sims = 5000, bootstrap_sims = FALSE,
+                diagnosands = declare_diagnosands(
+                  se = mean(std.error),
+                  power = mean(conf.low > 0)))
+```
+:::
+:::
+
+<!-- after: With control variables that predict the outcome with an $R^2$ of 5% -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Rule 6: respondents per condition for 95% power to detect 3 points (rounded up)
+ceiling(2*(3.3*20.8/3)^2)                   # without control variables
+ceiling(2*(3.3*20.8*sqrt(1 - 0.05)/3)^2)    # with control variables (R^2 = 5%)
+```
+:::
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Check by simulation
+
+::: {.panel-tabset group="simulation"}
+### Base R
+
+```{r}
+#| label: sim-rule-6-base-r
+#| message: false
+#| cache: true
+# simulate the two studies from Rule 6: outcomes with an SD of 20.8 within each condition and a
+#   treatment effect of 3, with 1,047 respondents per condition and no control variables, and
+#   with 995 respondents per condition and a control variable with an R^2 of 5%; analyze each
+#   experiment as in the paper (OLS, with the control variable when there is one, and HC2
+#   standard errors; reject if the lower bound of the 90% confidence interval is above zero)
+
+library(sandwich)  # robust standard errors
+library(lmtest)    # confidence intervals with robust standard errors
+
+set.seed(1234)
+sd_y <- 20.8
+tau  <- 3  # smallest substantively meaningful effect
+
+simulate_experiment <- function(n, r_sq) {
+  x   <- rnorm(2*n)                                # the control variable
+  u   <- rnorm(2*n)
+  y0  <- sd_y*(sqrt(r_sq)*x + sqrt(1 - r_sq)*u)    # potential outcomes under control (x explains
+  y1  <- y0 + tau                                  #   a share r_sq of the variance)...and under treatment
+  z   <- sample(rep(0:1, each = n))                # n respondents to each condition, at random
+  y   <- ifelse(z == 1, y1, y0)
+  fit <- if (r_sq > 0) lm(y ~ z + x) else lm(y ~ z)
+  v   <- vcovHC(fit, type = "HC2")
+  ci  <- coefci(fit, "z", level = 0.90, vcov. = v, df = Inf)
+  c(se = sqrt(v["z", "z"]), reject = ci[1] > 0)
+}
+simulate_study <- function(n, r_sq) rowMeans(replicate(5000, simulate_experiment(n, r_sq)))
+
+# the average standard error (Rules 3 and 4: 0.91 in both studies) and the share of rejections
+#   (Rule 6: 95%)
+rbind(without_controls = simulate_study(n = 1047, r_sq = 0),
+      with_controls    = simulate_study(n = 995,  r_sq = 0.05))
+```
+
+### DeclareDesign
+
+The design follows [Declaration 18.1](https://book.declaredesign.org/library/experimental-causal.html) in Blair, Coppock, and Humphreys ([2023](#ref-Blair2023)).
+
+```{r}
+#| label: sim-rule-6-declaredesign
+#| message: false
+#| cache: true
+# the two studies from Rule 6 as designs: outcomes with an SD of 20.8 within each condition and
+#   a treatment effect of 3, with 1,047 respondents per condition and no control variables, and
+#   with 995 respondents per condition and a control variable with an R^2 of 5%; analyze each
+#   experiment as in the paper (OLS with the control variable, which explains nothing in the
+#   first study, and HC2 standard errors; reject if the lower bound of the 90% confidence
+#   interval is above zero)
+
+library(DeclareDesign)
+
+n    <- 1047
+sd_y <- 20.8
+r_sq <- 0
+tau  <- 3  # smallest substantively meaningful effect
+
+study <-
+  declare_model(N = 2 * n,
+                X = rnorm(N),  # the control variable, which explains a share r_sq of the variance
+                U = rnorm(N),
+                potential_outcomes(Y ~ tau * Z + sd_y * (sqrt(r_sq) * X + sqrt(1 - r_sq) * U))) +
+  declare_inquiry(ATE = mean(Y_Z_1 - Y_Z_0)) +
+  declare_assignment(Z = complete_ra(N, prob = 0.5)) +
+  declare_measurement(Y = reveal_outcomes(Y ~ Z)) +
+  declare_estimator(Y ~ Z + X, .method = lm_robust, se_type = "HC2", term = "Z",
+                    inquiry = "ATE", alpha = 0.10)
+
+# the two studies: the design above, and the design with 995 respondents per condition and an
+#   R^2 of 5%
+studies <- redesign(study, n = c(1047, 995), r_sq = c(0, 0.05), expand = FALSE)
+
+# the average standard error (Rules 3 and 4: 0.91 in both studies) and the share of rejections
+#   (Rule 6: 95%)
+set.seed(1234)
+diagnose_design(studies, sims = 5000, bootstrap_sims = FALSE,
+                diagnosands = declare_diagnosands(
+                  se = mean(std.error),
+                  power = mean(conf.low > 0)))
+```
+:::
+:::
+
+<!-- after: This is about 19% more than the 1,047 -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Rule 6 for a two-sided test (rounded up)
+ceiling(2*(3.6*20.8/3)^2)
+
+# percent more than the one-sided test
+100*(1247/1047 - 1)
+```
+:::
+
+<!-- after: With less rounding error, this becomes 75%. -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Rule 7: the ratio of the sample sizes for 95% and 80% power
+(3.3/2.5)^2
+
+# with less rounding error
+((qnorm(0.95) + qnorm(0.95))/(qnorm(0.95) + qnorm(0.80)))^2
+```
+:::
+
+<!-- after: With less rounding error, this becomes 66%. -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Rule 7 for a two-sided test
+(3.6/2.8)^2
+
+# with less rounding error
+((qnorm(0.975) + qnorm(0.95))/(qnorm(0.975) + qnorm(0.80)))^2
+```
+:::
+
+<!-- after: equal to the standard error of the estimate of $\tau$.[^12] -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+```{r}
+#| cache: true
+# footnote 12: Rule 1 compared to simulated experiments that use the estimated SE
+#   (balanced design, normal outcomes, constant treatment effect)
+set.seed(1234)
+
+# design
+n     <- 50                # respondents per condition
+sigma <- 1                 # SD of the outcome within each condition
+se    <- 2*sigma/sqrt(2*n) # true SE (Rule 3)
+tau   <- 2.5*se            # treatment effect, so that tau/SE = 2.5
+
+# simulate experiments; reject if the lower bound of the 90% CI is above zero
+#   - for a difference in means, the HC2 SE is sqrt(s1^2/n + s0^2/n)
+simulate_experiments <- function(n_exp) {
+  y0 <- matrix(rnorm(n_exp*n, mean = 0,   sd = sigma), nrow = n_exp)
+  y1 <- matrix(rnorm(n_exp*n, mean = tau, sd = sigma), nrow = n_exp)
+  row_var <- function(y) rowSums((y - rowMeans(y))^2)/(n - 1)
+  tau_hat <- rowMeans(y1) - rowMeans(y0)
+  se_hat  <- sqrt(row_var(y1)/n + row_var(y0)/n)
+  tau_hat - 1.64*se_hat > 0
+}
+reject <- map(rep(10000, 100), simulate_experiments) %>% unlist()  # 1,000,000 experiments
+
+# power from Rule 1 and simulated power
+power_rule_1 <- 1 - pnorm(1.64*se, mean = tau, sd = se)
+power_sim    <- mean(reject)
+c(rule_1 = power_rule_1, simulation = power_sim)
+
+# difference (percentage points)
+100*abs(power_sim - power_rule_1)
+```
+:::
+
+<!-- after: simply measures the outcome.[^17] -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# footnote 17: the pooled SD exceeds the within-condition SD by sqrt(1 + (tau/sigma)^2/4)
+inflation <- function(d) sqrt(1 + d^2/4)
+
+# power predicted with the pooled SD when the true power is 80%
+predicted_power <- function(d) 1 - pnorm(qnorm(0.95) - (qnorm(0.95) + qnorm(0.80))/inflation(d))
+
+# small effect (0.2): inflation of the SD and SE (%), of the sample size (%), predicted power
+100*(inflation(0.2) - 1)
+100*(inflation(0.2)^2 - 1)
+predicted_power(0.2)
+
+# large effect (0.8)
+100*(inflation(0.8) - 1)
+100*(inflation(0.8)^2 - 1)
+predicted_power(0.8)
+```
+:::
+
+<!-- after: reference populations "like" our experimental sample.[^26] -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# footnote 25: the SD of a uniform distribution is the range divided by sqrt(12)
+sqrt(12)
+100/sqrt(12)  # a 101-point scale
+```
+:::
+
+<!-- after: respondents per condition, respectively.[^29] -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# footnote 28: effects that are 10% of a standard deviation, so (SD/tau)^2 = 100
+2*c(2.5, 3.3, 2.8, 3.6)^2      # factors: one-sided 80% and 95%, two-sided 80% and 95%
+100*round(2*c(2.5, 3.3, 2.8, 3.6)^2, 1)  # respondents per condition
+```
+:::
+
+<!-- after: Table 3. This table shows the minimum detectable effect, in standard errors, for a variety -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Table 3: minimum detectable effect (in SEs) and percent change in sample size from 80% power
+#   (one-sided test)
+power <- c(0.2, 0.4, 0.6, 0.8, 0.9, 0.95, 0.98, 0.99, 0.999)
+mde   <- qnorm(0.95) + qnorm(power)
+change_in_n <- 100*((mde/(qnorm(0.95) + qnorm(0.80)))^2 - 1)  # from the unrounded factors
+tibble(power, mde = round(mde, 1), change_in_n = round(change_in_n))
+```
+:::
+
+<!-- after: Table 4. This table is an alternative version of Table -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# Table 4: the same for the two-sided test
+mde_2s <- qnorm(0.975) + qnorm(power)
+change_in_n_2s <- 100*((mde_2s/(qnorm(0.975) + qnorm(0.80)))^2 - 1)
+tibble(power, mde = round(mde_2s, 1), change_in_n = round(change_in_n_2s))
+```
+:::
+
+<!-- after: increase their sample size by about 27% for 80% power -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# increase in sample size for the two-sided test, at 80% and 95% power (%)
+100*(((qnorm(0.975) + qnorm(0.80))/(qnorm(0.95) + qnorm(0.80)))^2 - 1)
+100*(((qnorm(0.975) + qnorm(0.95))/(qnorm(0.95) + qnorm(0.95)))^2 - 1)
+```
+:::
+
+<!-- after: A 60/40 split inflates the standard error by about 2% -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# inflation of the SE when a fraction p of respondents is assigned to treatment (%)
+p <- c(0.6, 0.7, 0.8, 0.9)
+100*(1/sqrt(4*p*(1 - p)) - 1)
+```
+:::
+
+<!-- after: this 40% inflation roughly doubles the sample size -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# inflation of the SE with 20 sampled respondents per cluster and an ICC of 0.05
+sqrt(1 + (20 - 1)*0.05)
+
+# inflation of the required sample size
+sqrt(1 + (20 - 1)*0.05)^2
+```
+:::
+
+<!-- after: thus the standard error for the interaction is -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# SE for the interaction relative to the SE for the treatment effect (any n)
+n <- 100
+(2/sqrt(n))/(2/sqrt(2*n))
+
+# total sample size relative to a two-arm study with the same precision: twice the
+#   respondents per condition and twice the conditions
+2*2
+
+# Gelman's 16: the same, with an interaction half the size of the main effect
+2*2*(1/0.5)^2
+```
+:::
+
+<!-- after: testing the interaction roughly quadruples the required sample size -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# the interaction Robbins et al. expected
+1.00 - 0.33
+
+# Rule 6, modified for interactions: respondents per condition (rounded up), and in total
+n_80 <- ceiling(4*(2.5*2.0/0.67)^2)
+n_95 <- ceiling(4*(3.3*2.0/0.67)^2)
+c(n_80, n_95)
+4*c(n_80, n_95)
+
+# a two-arm study to detect a treatment effect of 0.67, 80% power
+n_ate <- ceiling(2*(2.5*2.0/0.67)^2)
+c(n_ate, 2*n_ate)
+```
+:::
+
+::: {.callout-note collapse="true" appearance="simple"}
+## Check by simulation
+
+::: {.panel-tabset group="simulation"}
+### Base R
+
+```{r}
+#| label: sim-interaction-base-r
+#| message: false
+#| cache: true
+# simulate Robbins et al.'s 2 x 2 factorial design: outcomes with an SD of 2.0 within each
+#   condition, an interaction of 0.67, and 223 respondents per condition (for 80% power) or 389
+#   (for 95%); analyze each experiment as in the paper (OLS with the two treatments and their
+#   interaction, with HC2 standard errors; reject if the lower bound of the 90% confidence
+#   interval for the interaction is above zero)
+
+library(sandwich)  # robust standard errors
+library(lmtest)    # confidence intervals with robust standard errors
+
+set.seed(1234)
+sd_y  <- 2.0
+delta <- 0.67  # smallest substantively meaningful interaction
+
+simulate_experiment <- function(n) {
+  condition <- sample(rep(1:4, each = n))    # n respondents to each of the four conditions, at random
+  z1  <- as.numeric(condition %in% c(2, 4))
+  z2  <- as.numeric(condition %in% c(3, 4))
+  y   <- delta*z1*z2 + rnorm(4*n, mean = 0, sd = sd_y)   # the main effects are zero; they do not
+  fit <- lm(y ~ z1*z2)                                   #   affect the interaction's SE or power
+  v   <- vcovHC(fit, type = "HC2")
+  ci  <- coefci(fit, "z1:z2", level = 0.90, vcov. = v, df = Inf)
+  c(se = sqrt(v["z1:z2", "z1:z2"]), reject = ci[1] > 0)
+}
+simulate_study <- function(n) rowMeans(replicate(5000, simulate_experiment(n)))
+
+# the average standard error (Rule 3, modified for interactions: 0.27 and 0.20) and the share of
+#   rejections (Rule 6, modified for interactions: 80% and 95%)
+rbind(n_223 = simulate_study(n = 223),
+      n_389 = simulate_study(n = 389))
+```
+
+### DeclareDesign
+
+The design follows [Declaration 18.1](https://book.declaredesign.org/library/experimental-causal.html) in Blair, Coppock, and Humphreys ([2023](#ref-Blair2023)), extended to a 2 × 2 factorial design.
+
+```{r}
+#| label: sim-interaction-declaredesign
+#| message: false
+#| cache: true
+# Robbins et al.'s 2 x 2 factorial design: outcomes with an SD of 2.0 within each condition, an
+#   interaction of 0.67 (the main effects are zero; they do not affect the interaction's SE or
+#   power), and 223 respondents per condition (for 80% power) or 389 (for 95%); analyze each
+#   experiment as in the paper (OLS with the two treatments and their interaction, with HC2
+#   standard errors; reject if the lower bound of the 90% confidence interval for the
+#   interaction is above zero)
+
+library(DeclareDesign)
+
+n     <- 223
+sd_y  <- 2.0
+delta <- 0.67  # smallest substantively meaningful interaction
+
+factorial <-
+  declare_model(N = 4 * n,
+                U = rnorm(N, sd = sd_y),
+                potential_outcomes(Y ~ delta * Z1 * Z2 + U,
+                                   conditions = list(Z1 = c(0, 1), Z2 = c(0, 1)))) +
+  declare_inquiry(interaction = mean((Y_Z1_1_Z2_1 - Y_Z1_0_Z2_1) - (Y_Z1_1_Z2_0 - Y_Z1_0_Z2_0))) +
+  declare_assignment(Z1 = complete_ra(N, prob = 0.5),                # n respondents to each of
+                     Z2 = block_ra(blocks = Z1, prob = 0.5)) +       #   the four conditions
+  declare_measurement(Y = reveal_outcomes(Y ~ Z1 + Z2)) +
+  declare_estimator(Y ~ Z1 * Z2, .method = lm_robust, se_type = "HC2", term = "Z1:Z2",
+                    inquiry = "interaction", alpha = 0.10)
+
+# the average standard error (Rule 3, modified for interactions: 0.27 and 0.20) and the share of
+#   rejections (Rule 6, modified for interactions: 80% and 95%)
+set.seed(1234)
+diagnose_design(redesign(factorial, n = c(223, 389)), sims = 5000, bootstrap_sims = FALSE,
+                diagnosands = declare_diagnosands(
+                  se = mean(std.error),
+                  power = mean(conf.low > 0)))
+```
+:::
+:::
+
+<!-- after: and find $d_{33} = (1.96 + \Phi_{std}^{-1}(1/3)) \cdot SE \approx 1.5 \cdot SE$ -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# d33: the minimum detectable effect (in SEs) at 33% power, two-sided
+d33 <- qnorm(0.975) + qnorm(1/3)
+d33
+
+# the 80% MDE under the same convention
+qnorm(0.975) + qnorm(0.80)
+```
+:::
+
+<!-- after: Consider a study with $SE = 0.05$. -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# a study with SE = 0.05: its 80% MDE and its d33
+2.8*0.05
+d33*0.05
+```
+:::
+
+<!-- after: times the original sample. -->
+::: {.callout-note collapse="true" appearance="simple"}
+## R code
+
+```{r}
+# the replication's SE, relative to the original SE (Rule 5 with d33 = 1.5 SEs)
+1.5/2.5
+
+# the replication's sample size, relative to the original
+(1/0.6)^2
+
+# footnote 36: without the intermediate rounding
+(2.48/d33)^2
+```
+:::

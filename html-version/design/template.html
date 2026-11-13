@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title$: $subtitle$</title>
+<meta name="author" content="$author$">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&display=swap">
+<link rel="stylesheet" href="power-rules.css">
+<script>
+window.MathJax = {
+  chtml: { matchFontHeight: true },
+  startup: {  // not one keyboard stop per formula
+    pageReady: () => MathJax.startup.defaultPageReady().then(() =>
+      document.querySelectorAll("mjx-container[tabindex]").forEach(m => m.removeAttribute("tabindex")))
+  }
+};
+</script>
+<!-- MathJax 4 breaks long inline math at the end of a line (3 lets it run off a phone screen) -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
+<script defer src="power-rules.js"></script>
+$if(ga-id)$
+<!-- Google Analytics, the same tag as the rest of carlislerainey.com -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=$ga-id$"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '$ga-id$', { 'anonymize_ip': true});
+</script>
+$endif$
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">$title$</h1>
+<p class="subtitle">$subtitle$</p>
+<p class="author">$author$</p>
+<section class="abstract">
+<h2 class="abstract-title">Abstract</h2>
+$abstract$
+</section>
+<nav class="links" aria-label="Other versions">
+$if(journal-url)$
+<a href="$journal-url$">Journal version</a>
+$endif$
+<a href="$pdf-url$">PDF</a>
+<a href="$dataverse-url$">Replication files</a>
+<a href="$app-url$">App</a>
+<a href="$package-url$">R package</a>
+</nav>
+</header>
+<nav id="TOC" aria-label="Contents">
+<details open>
+<summary>Contents</summary>
+$table-of-contents$
+</details>
+</nav>
+<main>
+$body$
+</main>
+</body>
+</html>

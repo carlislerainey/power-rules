@@ -1,0 +1,19 @@
+A only: Power Rules
+
+A only: Practical Advice for Computing Statistical Power
+
+A only: Carlisle Rainey DATE Latest version here.
+
+~ [-Abstract-] Recent work emphasizes the … to be very low.
+
+A only: † † Carlisle Rainey is Professor of Political Science, Florida State University, 540 Bellamy, Tallahassee, FL, 32306. (crainey@fsu.edu).
+
+A only: Appendix to
+
+~ [-Carlisle Rainey-] Throughout the paper, I … 80% or 95% power.
+
+A only: † † Carlisle Rainey is Professor of Political Science, Florida State University, 540 Bellamy, Tallahassee, FL, 32306. (crainey@fsu.edu).
+
+B only: Carlisle Rainey
+
+B only: Abstract
