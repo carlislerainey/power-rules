@@ -1,0 +1,434 @@
+/* board.css — Whiteboard styling for the Power Rules Shiny app */
+
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;600&family=Shantell+Sans:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* --- Base --- */
+body {
+  background-color: #f5f3ef;
+  margin: 0;
+  padding: 0;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 21px;
+  color: #2d2d2d;
+}
+
+/* --- Handwriting: what gets written on the board (the choices, the typed
+   values, the formulas, and the result) --- */
+.inline-select,
+.input-value input[type="number"],
+.custom-power-wrapper input[type="number"],
+.total-annotation,
+.formula-line,
+.result-highlight {
+  font-family: 'Shantell Sans', 'Fira Sans', sans-serif;
+  font-size-adjust: 0.53;  /* Fira Sans's x-height, so the sizes match the labels */
+}
+
+/* the rule labels beside the formulas stay in the board's font */
+.formula-line .rule-ref {
+  font-family: 'Fira Sans', sans-serif;
+  font-size-adjust: none;
+}
+
+/* --- Board layout --- */
+.board-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.board {
+  background: #fff;
+  max-width: 960px;
+  width: 100%;
+  padding: 2.5rem 3rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+}
+
+/* --- Title --- */
+.board-title {
+  font-size: 2.2rem;
+  color: #2d2d2d;
+  text-align: center;
+}
+
+.title-rule {
+  border: none;
+  border-top: 2px solid #2d2d2d;
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+.section-rule {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 1.5rem 0;
+}
+
+/* --- Problem statement --- */
+.problem-statement {
+  font-size: 1.8rem;
+  line-height: 2.4;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* --- Inline selects in problem statement --- */
+.inline-select-container {
+  display: inline-block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  vertical-align: baseline;
+}
+
+.inline-select {
+  font-size: 1.8rem;
+  color: #1a5fb4;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #1a5fb4;
+  border-radius: 0;
+  padding: 0.1rem 1.4rem 0.1rem 0.3rem;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%231a5fb4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.2rem center;
+  background-size: 10px 6px;
+  width: auto !important;
+  height: auto !important;
+  line-height: normal;
+}
+
+.inline-select:focus {
+  outline: none;
+  border-bottom-color: #0d4a8f;
+}
+
+/* --- Settings section --- */
+.settings-section {
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.settings-section .control-label {
+  font-size: 1.8rem;
+  font-weight: normal;
+  color: #2d2d2d;
+}
+
+.settings-section .radio-inline,
+.settings-section .radio label {
+  font-size: 1.8rem;
+}
+
+.settings-section .form-group {
+  margin-bottom: 0.4rem;
+}
+
+/* --- Input section: table layout --- */
+.inputs-section {
+  margin: 1rem 0;
+}
+
+.input-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin: 0.5rem 0;
+}
+
+.input-name {
+  font-size: 1.8rem;
+  color: #2d2d2d;
+  text-align: right;
+  min-width: 200px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.input-value {
+  display: inline-flex;
+  align-items: baseline;
+  flex-shrink: 0;
+}
+
+.input-value .form-group {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.input-value .shiny-input-container {
+  width: auto !important;
+}
+
+.input-value input[type="number"] {
+  font-size: 1.8rem;
+  color: #2d2d2d;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  border-radius: 0;
+  padding: 0.2rem 0.3rem;
+  width: 140px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.input-value input[type="number"]:focus {
+  outline: none;
+  border-bottom-color: #2d2d2d;
+  box-shadow: none;
+}
+
+.input-value input[type="number"]::placeholder {
+  color: #bbb;
+  font-style: italic;
+  font-weight: normal;
+  font-size: 1.3rem;
+}
+
+/* Hide spinner buttons on number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.input-desc {
+  font-size: 1.2rem;
+  color: #999;
+  font-style: italic;
+  flex: 1;
+}
+
+/* Total annotation next to n_planned */
+.total-annotation {
+  font-size: 1.8rem;
+  color: #888;
+  margin-left: 0.3rem;
+}
+
+/* Custom power input */
+.custom-power-wrapper {
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.custom-power-wrapper .form-group {
+  margin: 0 !important;
+  display: inline-block;
+}
+
+.custom-power-wrapper input[type="number"] {
+  font-size: 1.8rem;
+  color: #2d2d2d;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  border-radius: 0;
+  padding: 0.1rem 0.3rem;
+  width: 80px;
+  text-align: center;
+}
+
+.custom-power-wrapper input[type="number"]:focus {
+  outline: none;
+  border-bottom-color: #2d2d2d;
+  box-shadow: none;
+}
+
+/* --- Computation section --- */
+.computation-section {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.formula-line {
+  display: inline-flex;
+  align-items: baseline;
+  margin: 0.4rem 0;
+  font-size: 1.8rem;
+  line-height: 1.7;
+  width: 100%;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.formula-text {
+  white-space: nowrap;
+}
+
+.formula-continuation {
+  padding-left: 2em;
+}
+
+/* --- Text colors: black everywhere, gray for blanks and refs --- */
+.val-input {
+  color: #2d2d2d;
+}
+
+.val-result {
+  color: #2d2d2d;
+}
+
+.val-blank {
+  display: inline-block;
+  width: 2.5em;
+  border-bottom: 2px solid #ccc;
+  vertical-align: baseline;
+}
+
+.rule-ref {
+  color: #888;
+  font-size: 1.3rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* --- Result highlight --- */
+.result-highlight {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  font-size: 2.1rem;
+  color: #2d2d2d;
+}
+
+.result-value-red {
+  color: #c01c28;
+  font-weight: bold;
+  font-size: 2.8rem;
+}
+
+.result-value-blue {
+  color: #1a5fb4;
+  font-weight: bold;
+  font-size: 2.8rem;
+}
+
+/* --- Manuscript sentence box --- */
+.sentence-box {
+  background: #faf8f2;
+  border: 1px solid #e8e4d8;
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.sentence-header {
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.sentence-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #2d2d2d;
+}
+
+/* --- Note box --- */
+.note-box {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.9rem;
+  color: #888;
+  line-height: 1.5;
+  margin: 0.5rem 0;
+  padding: 0 1.5rem;
+  font-style: italic;
+}
+
+/* --- Input problem box --- */
+.problem-box {
+  font-size: 0.9rem;
+  color: #c01c28;
+  line-height: 1.5;
+  margin: 0.75rem 0 0;
+}
+
+/* --- Pipeline code box --- */
+.pipeline-box {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.pipeline-header {
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.pipeline-code {
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #2d2d2d;
+}
+
+/* --- Copy button --- */
+.copy-btn {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  font-size: 1rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  background: #eee;
+  color: #333;
+}
+
+.copy-btn:active {
+  background: #ddd;
+}
+
+/* --- Override Shiny bootstrap defaults --- */
+.board .form-group {
+  margin-bottom: 0;
+}
+
+.board .form-control {
+  box-shadow: none !important;
+}
+
+.board .shiny-input-container:not(.inline-select-container) {
+  width: auto !important;
+}
+
+/* --- Smooth transitions --- */
+.computation-section,
+.result-highlight,
+.sentence-box,
+.note-box,
+.pipeline-box {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

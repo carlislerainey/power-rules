@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Power Rules</title>
+  <!-- The page of the Shiny guide in the R package powerrules (inst/shiny/app.R),
+       as static files. base.css stands in for Bootstrap 3; board.css is the
+       package's, byte for byte. -->
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="board.css">
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="board-container">
+      <div class="board">
+
+        <!-- Title -->
+        <div class="board-title">Power Rules</div>
+        <hr class="title-rule">
+
+        <!-- Problem statement -->
+        <div class="problem-statement">
+          I have
+          <span class="form-group shiny-input-container inline-select-container">
+            <select id="source_type" class="form-control inline-select">
+              <option value="sd" selected>an estimate of SD(Y)</option>
+              <option value="existing">the SE from an existing study</option>
+              <option value="pilot">the SE from my pilot</option>
+            </select>
+          </span>
+           and I want to find
+          <span class="form-group shiny-input-container inline-select-container">
+            <select id="goal_type" class="form-control inline-select">
+              <option value="mde" selected>the MDE</option>
+              <option value="power">the power</option>
+              <option value="n">the sample size</option>
+            </select>
+          </span>
+           for
+          <span class="form-group shiny-input-container inline-select-container">
+            <select id="design_type" class="form-control inline-select">
+              <option value="treatment" selected>a treatment effect</option>
+              <option value="interaction">an interaction</option>
+            </select>
+          </span>
+          .
+        </div>
+
+        <hr class="section-rule">
+
+        <!-- Settings -->
+        <div class="settings-section">
+          <div id="panel-power" hidden>
+            <div id="power_choice" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline" role="radiogroup" aria-labelledby="power_choice-label">
+              <label class="control-label" id="power_choice-label" for="power_choice">Power level:</label>
+              <div class="shiny-options-group">
+                <label class="radio-inline">
+                  <input type="radio" name="power_choice" value="0.80" checked>
+                  <span>80%</span>
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="power_choice" value="0.90">
+                  <span>90%</span>
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="power_choice" value="0.95">
+                  <span>95%</span>
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="power_choice" value="custom">
+                  <span>Custom</span>
+                </label>
+              </div>
+            </div>
+            <div id="panel-custom-power" hidden>
+              <span class="custom-power-wrapper">
+                <div class="form-group shiny-input-container">
+                  <input id="custom_power" type="number" class="form-control" min="0.01" max="0.99" step="0.01" placeholder="e.g., 0.85" aria-labelledby="power_choice-label">
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-rule">
+
+        <!-- Numeric inputs (table: name | value | description) -->
+        <div class="inputs-section">
+
+          <!-- from_sd -->
+          <div id="panel-sd">
+            <div class="input-row">
+              <span class="input-name" id="sd_y-name">SD(Y) =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="sd_y" type="number" class="form-control" placeholder="e.g., 20.8" aria-labelledby="sd_y-name" aria-describedby="sd_y-desc">
+                </div>
+              </div>
+              <span class="input-desc" id="sd_y-desc">SD of the outcome in a population like yours, e.g., from a census or prior study</span>
+            </div>
+            <div class="input-row">
+              <span class="input-name" id="r_squared-name">R² =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="r_squared" type="number" class="form-control" placeholder="e.g., 0.05" aria-labelledby="r_squared-name" aria-describedby="r_squared-desc">
+                </div>
+              </div>
+              <span class="input-desc" id="r_squared-desc">proportion of variance explained by covariates; leave blank for no adjustment</span>
+            </div>
+          </div>
+
+          <!-- from_existing -->
+          <div id="panel-existing" hidden>
+            <div class="input-row">
+              <span class="input-name" id="se_existing-name">SE (existing) =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="se_existing" type="number" class="form-control" placeholder="e.g., 1.8" aria-labelledby="se_existing-name" aria-describedby="se_existing-desc">
+                </div>
+              </div>
+              <span class="input-desc" id="se_existing-desc">standard error of the treatment effect from that study</span>
+            </div>
+            <div class="input-row">
+              <span class="input-name" id="n_existing-name">n (existing) =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="n_existing" type="number" class="form-control" placeholder="per condition" aria-labelledby="n_existing-name" aria-describedby="n_existing-desc">
+                </div>
+              </div>
+              <span class="input-desc" id="n_existing-desc">number of respondents per condition in that study</span>
+            </div>
+          </div>
+
+          <!-- from_pilot -->
+          <div id="panel-pilot" hidden>
+            <div class="input-row">
+              <span class="input-name" id="se_pilot-name">SE (pilot) =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="se_pilot" type="number" class="form-control" placeholder="e.g., 2.13" aria-labelledby="se_pilot-name" aria-describedby="se_pilot-desc">
+                </div>
+              </div>
+              <span class="input-desc" id="se_pilot-desc">standard error of the treatment effect from that study</span>
+            </div>
+            <div class="input-row">
+              <span class="input-name" id="n_pilot-name">n (pilot) =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="n_pilot" type="number" class="form-control" placeholder="per condition" aria-labelledby="n_pilot-name" aria-describedby="n_pilot-desc">
+                </div>
+              </div>
+              <span class="input-desc" id="n_pilot-desc">number of respondents per condition in that study</span>
+            </div>
+          </div>
+
+          <!-- n_planned (for find_mde and find_power) -->
+          <div id="panel-n-planned">
+            <div class="input-row">
+              <span class="input-name" id="n_label">n =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="n_planned" type="number" class="form-control" placeholder="per condition" aria-labelledby="n_label" aria-describedby="n_planned-desc">
+                </div>
+                <span id="total_annotation"></span>
+              </div>
+              <span class="input-desc" id="n_planned-desc">number of respondents per condition in the planned study</span>
+            </div>
+          </div>
+
+          <!-- tau (for find_power and find_n) -->
+          <div id="panel-tau" hidden>
+            <div class="input-row">
+              <span class="input-name" id="tau-name">tau =</span>
+              <div class="input-value">
+                <div class="form-group shiny-input-container">
+                  <input id="tau" type="number" class="form-control" placeholder="effect size" aria-labelledby="tau-name" aria-describedby="tau-desc">
+                </div>
+              </div>
+              <span class="input-desc" id="tau-desc">the smallest treatment effect you'd consider meaningful, in units of the outcome</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input problem (shown instead of a silently wrong or blank result) -->
+        <div id="problem_box" aria-live="polite"></div>
+
+        <hr class="section-rule">
+
+        <!-- Computation -->
+        <div class="computation-section">
+          <div id="computation" aria-live="polite"></div>
+        </div>
+
+        <!-- Result highlight -->
+        <div id="result_highlight" aria-live="polite"></div>
+
+        <hr class="section-rule">
+
+        <!-- Manuscript sentence -->
+        <div id="sentence_box"></div>
+
+        <!-- Note -->
+        <div id="note_box"></div>
+
+        <hr class="section-rule">
+
+        <!-- Pipeline -->
+        <div id="pipeline_box"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="powerrules.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

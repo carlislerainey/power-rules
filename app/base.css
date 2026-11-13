@@ -1,0 +1,239 @@
+/* base.css: what board.css was written on top of.
+ *
+ * The Shiny guide is a Bootstrap 3 page, and board.css (copied here byte for
+ * byte) counts on it: Bootstrap sets the root font size to 10px, so every rem
+ * in board.css is 10px, and it sizes the boxes and resets the form controls.
+ * These are the rules of the Shiny page's stylesheets that match an element
+ * of the board, and no others. Load this file before board.css.
+ *
+ * From Bootstrap v3.4.1 (https://getbootstrap.com/), Copyright 2011-2019
+ * Twitter, Inc., licensed under MIT
+ * (https://github.com/twbs/bootstrap/blob/master/LICENSE), which includes
+ * normalize.css v3.0.3 (MIT License, github.com/necolas/normalize.css); and
+ * from shiny.css in Shiny 1.14.0. The declarations for Internet Explorer and
+ * the prefixed copies of box-sizing, box-shadow, and transition are left out.
+ */
+
+/* --- shiny.css --- */
+.shiny-input-radiogroup label ~ .shiny-options-group {
+  margin-top: -10px;
+}
+
+.shiny-input-radiogroup.shiny-input-container-inline label ~ .shiny-options-group {
+  margin-top: -1px;
+}
+
+.shiny-input-container:not(.shiny-input-container-inline) {
+  width: 300px;
+  max-width: 100%;
+}
+
+/* --- normalize.css --- */
+html {
+  font-family: sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+hr {
+  box-sizing: content-box;
+  height: 0;
+}
+
+code {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+button,
+input,
+select {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+button {
+  overflow: visible;
+}
+
+button,
+select {
+  text-transform: none;
+}
+
+button {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+input {
+  line-height: normal;
+}
+
+input[type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/* --- Bootstrap: scaffolding --- */
+* {
+  box-sizing: border-box;
+}
+
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 10px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+/* --- Bootstrap: code --- */
+code {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: #c7254e;
+  background-color: #f9f2f4;
+  border-radius: 4px;
+}
+
+/* --- Bootstrap: grid --- */
+.container-fluid {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* --- Bootstrap: forms --- */
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+input[type="radio"] {
+  margin: 4px 0 0;
+  line-height: normal;
+}
+
+input[type="radio"]:focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.form-control:focus {
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+}
+
+.form-control::-moz-placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+.form-control::-webkit-input-placeholder {
+  color: #999;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.radio-inline input[type="radio"] {
+  position: absolute;
+  margin-left: -20px;
+}
+
+.radio-inline {
+  position: relative;
+  display: inline-block;
+  padding-left: 20px;
+  margin-bottom: 0;
+  font-weight: 400;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.radio-inline + .radio-inline {
+  margin-top: 0;
+  margin-left: 10px;
+}
+
+/* --- Bootstrap: clearfix --- */
+.container-fluid:before,
+.container-fluid:after {
+  display: table;
+  content: " ";
+}
+
+.container-fluid:after {
+  clear: both;
+}
+
+/* --- The blocks of inputs that the choices hide (Shiny's conditional panels) --- */
+[hidden] {
+  display: none !important;
+}
